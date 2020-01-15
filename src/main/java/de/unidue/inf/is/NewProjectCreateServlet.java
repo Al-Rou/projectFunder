@@ -17,28 +17,22 @@ import de.unidue.inf.is.stores.ProjektStore;
 public final class NewProjectCreateServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private String email;
+    private static List<String> vorgaengerList = new ArrayList<>();
+    private static ProjektStore projektStore = new ProjektStore();
 
-    private static List<User> userList = new ArrayList<>();
-
-    // Just prepare static data to display on screen
-    static {
-        userList.add(new User("Bill", "Gates",
-                "bill@gates.com","The richest"));
-        userList.add(new User("Steve", "Jobs",
-                "steve@jobs.com","Now dead"));
-        userList.add(new User("Larry", "Page",
-                "larry@page.com",""));
-        userList.add(new User("Sergey", "Brin",
-                "sergey@brin.com","Idk!"));
-        userList.add(new User("Larry", "Ellison",
-                "larry@ellison.com",""));
+    public void setEmail(String e)
+    {
+        email = e;
     }
-
-
+    public String getEmail(){
+        return email;
+    }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        request.setAttribute("users", userList);
+        vorgaengerList = projektStore.vorgaengerList(getEmail());
+        request.setAttribute("vorprojekte", vorgaengerList);
 
         request.getRequestDispatcher("/new_project.ftl").forward(request, response); }
     @Override

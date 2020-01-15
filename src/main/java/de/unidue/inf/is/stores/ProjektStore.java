@@ -119,6 +119,25 @@ public final class ProjektStore implements Closeable {
         }
     }
 
+    public List<String> vorgaengerList(String email) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select titel from projekt where ersteller='%s'"+email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<String> result = new ArrayList<>();
+            while (resultSet.next())
+            {
+                result.add(resultSet.getString(2));
+            }
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+
 
     public void complete() {
         complete = true;
