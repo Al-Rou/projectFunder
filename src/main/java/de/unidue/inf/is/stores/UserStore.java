@@ -19,7 +19,7 @@ public final class UserStore implements Closeable {
 
     public UserStore() throws StoreException {
         try {
-            connection = DBUtil.getConnection();
+            connection = DBUtil.getExternalConnection();
             connection.setAutoCommit(false);
         }
         catch (SQLException e) {
@@ -31,9 +31,11 @@ public final class UserStore implements Closeable {
     public void addUser(User userToAdd) throws StoreException {
         try {
             PreparedStatement preparedStatement = connection
-                            .prepareStatement("insert into user (firstname, lastname) values (?, ?)");
-            preparedStatement.setString(1, userToAdd.getFirstname());
-            preparedStatement.setString(2, userToAdd.getLastname());
+                            .prepareStatement("insert into benutzer (name,email,beschreibung) values (?, ?, ?)");
+            preparedStatement.setString(1, userToAdd.getFirstname()+
+                    userToAdd.getLastname());
+            preparedStatement.setString(2, userToAdd.getEmail());
+            preparedStatement.setString(3, userToAdd.getExplanation());
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {

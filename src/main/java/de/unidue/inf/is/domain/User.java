@@ -7,11 +7,8 @@ public final class User {
     private String email;
     private String explanation;
 
-
     public User() {
     }
-
-
     public User(String firstname, String lastname,
                 String email, String explanation)
     {
@@ -19,10 +16,7 @@ public final class User {
         this.lastname = lastname;
         this.email = email;
         this.explanation = explanation;
-
     }
-
-
     public String getFirstname() {
         return firstname;
     }
@@ -36,5 +30,4 @@ public final class User {
     {
         return explanation;
     }
-
 }

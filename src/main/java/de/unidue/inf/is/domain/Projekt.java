@@ -2,32 +2,32 @@ package de.unidue.inf.is.domain;
 
 public final class Projekt
 {
-    private int kennung;
+    private Integer kennung;
     private String titel;
     private String beschreibung;
-    private long finanzierungslimit;
-    private boolean abgeschlossen;
+    private Double finanzierungslimit;
+    private String status;
     private String ersteller;
-    private int vorgaenger;
-    private int kategorie;
+    private Integer vorgaenger;
+    private Integer kategorie;
 
-    public Projekt(int kennung, String titel,
+    public Projekt(Integer kennung, String titel,
                    String beschreibung,
-                   long finanzierungslimit,
-                   boolean abgeschlossen, String ersteller,
-                   int vorgaenger, int kategorie)
+                   Double finanzierungslimit,
+                   String status, String ersteller,
+                   Integer vorgaenger, Integer kategorie)
     {
         this.kennung = kennung;
         this.titel = titel;
         this.beschreibung = beschreibung;
         this.finanzierungslimit = finanzierungslimit;
-        this.abgeschlossen = abgeschlossen;
+        this.status = status;
         this.ersteller = ersteller;
         this.vorgaenger = vorgaenger;
         this.kategorie = kategorie;
     }
 
-    public int getKennung() {
+    public Integer getKennung() {
         return kennung;
     }
 
@@ -39,23 +39,23 @@ public final class Projekt
         return beschreibung;
     }
 
-    public long getFinanzierungslimit() {
+    public Double getFinanzierungslimit() {
         return finanzierungslimit;
     }
 
-    public boolean getAbgeschlossen() {
-        return abgeschlossen;
+    public String getStatus() {
+        return status;
     }
 
     public String getErsteller() {
         return ersteller;
     }
 
-    public int getVorgaenger() {
+    public Integer getVorgaenger() {
         return vorgaenger;
     }
 
-    public int getKategorie() {
+    public Integer getKategorie() {
         return kategorie;
     }
 }

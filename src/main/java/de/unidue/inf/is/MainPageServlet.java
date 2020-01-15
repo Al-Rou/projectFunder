@@ -11,33 +11,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.User;
+import de.unidue.inf.is.stores.ProjektStore;
 
 
 public final class MainPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static List<Projekt> projektList = new ArrayList<>();
-
-    // Just prepare static data to display on screen
-    static {
-        projektList.add(new Projekt(1, "Ubuntu",
-                "Es ist OS!", 5000,
-                false,
-                "dummy@dummy.com", 1,
-                4));
-    }
+    private static List<Projekt> projektList1 = new ArrayList<>();
+    private static List<Projekt> projektList2 = new ArrayList<>();
+    private static ProjektStore projektStore = new ProjektStore();
 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        request.setAttribute("aufprojekte", projektList);
-        request.setAttribute("zuprojekte", projektList);
+        projektList1 = projektStore.findenOffenProjekte();
+        projektList2 = projektStore.findenAbgeschlosseneProjekte();
+        request.setAttribute("aufprojekte", projektList1);
+        request.setAttribute("zuprojekte", projektList2);
 
         request.getRequestDispatcher("/view_main.ftl").forward(request, response);
     }
-    @Override
+    /*@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
 
@@ -53,12 +49,12 @@ public final class MainPageServlet extends HttpServlet {
 
             synchronized (projektList) {
                 projektList.add(new Projekt(2, firstname,
-                        explanation, 1000, false,
+                        explanation, 1000.00, "offen",
                         email, 3, 3));
             }
 
         }
 
         doGet(request, response);
-    }
+    }*/
 }

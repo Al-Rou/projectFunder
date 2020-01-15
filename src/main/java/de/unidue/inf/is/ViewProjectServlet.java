@@ -22,8 +22,8 @@ public final class ViewProjectServlet extends HttpServlet {
     // Just prepare static data to display on screen
     static {
         projektList.add(new Projekt(1, "Ubuntu",
-                "Es ist OS!", 5000,
-                false,
+                "Es ist OS!", 5000.00,
+                "offen",
                 "dummy@dummy.com", 1,
                 4));
     }
