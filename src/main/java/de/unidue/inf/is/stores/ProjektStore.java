@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.unidue.inf.is.domain.Projekt;
+import de.unidue.inf.is.domain.Spenden;
 import de.unidue.inf.is.domain.User;
 import de.unidue.inf.is.utils.DBUtil;
 
@@ -33,14 +34,33 @@ public final class ProjektStore implements Closeable {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("insert into projekt (kennung,titel,beschreibung,vorgaenger," +
                             "kategorie,status,finanzierungslimit,ersteller) values (?,?,?,?,?,?,?,?)");
-            preparedStatement.setString(1, projektToAdd.getKennung().toString());
+            preparedStatement.setInt(1, projektToAdd.getKennung());
             preparedStatement.setString(2, projektToAdd.getTitel());
             preparedStatement.setString(3, projektToAdd.getBeschreibung());
-            preparedStatement.setString(4, projektToAdd.getVorgaenger().toString());
-            preparedStatement.setString(5, projektToAdd.getKategorie().toString());
+            preparedStatement.setInt(4, projektToAdd.getVorgaenger());
+            preparedStatement.setInt(5, projektToAdd.getKategorie());
             preparedStatement.setString(6, projektToAdd.getStatus());
-            preparedStatement.setString(7, projektToAdd.getFinanzierungslimit().toString());
+            preparedStatement.setDouble(7, projektToAdd.getFinanzierungslimit());
             preparedStatement.setString(8, projektToAdd.getErsteller());
+            preparedStatement.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new StoreException(e);
+        }
+    }
+    public void editProjekt(Projekt projektToAdd) throws StoreException {
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("update projekt set titel = ?, beschreibung = ?, vorgaenger = ?, kategorie = ?, status = ?, finanzierungslimit = ?, ersteller = ? where kennung = ?");
+
+            preparedStatement.setString(1, projektToAdd.getTitel());
+            preparedStatement.setString(2, projektToAdd.getBeschreibung());
+            preparedStatement.setInt(3, projektToAdd.getVorgaenger());
+            preparedStatement.setInt(4, projektToAdd.getKategorie());
+            preparedStatement.setString(5, projektToAdd.getStatus());
+            preparedStatement.setDouble(6, projektToAdd.getFinanzierungslimit());
+            preparedStatement.setString(7, projektToAdd.getErsteller());
+            preparedStatement.setInt(8, projektToAdd.getKennung());
             preparedStatement.executeUpdate();
         }
         catch (SQLException e) {
@@ -172,6 +192,21 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
+    public Integer findenKennungVon(String titel) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select kennung from projekt where titel = ?");
+            preparedStatement.setString(1, titel);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Integer result = resultSet.getInt(1);
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
     public List<Projekt> findenUnterstuezteProjekteVon(String email) throws StoreException
     {
         try {
@@ -239,6 +274,89 @@ public final class ProjektStore implements Closeable {
             while (resultSet.next())
             {
                 result.add(resultSet.getString(1));
+            }
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public String findenBeschreibungVon(String titel) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select beschreibung from projekt where titel = ?");
+            preparedStatement.setString(1, titel);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result = resultSet.getString(1);
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public Double findenFinanzierungsLimitVon(String titel) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select finanzierungslimit from projekt where titel = ?");
+            preparedStatement.setString(1, titel);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Double result = resultSet.getDouble(1);
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public Double findenTotalSpendeVomProjekt(Integer kennung) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select sum(spendenbetrag) from spenden where projekt = ?");
+            preparedStatement.setInt(1, kennung);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Double result = resultSet.getDouble(1);
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public String findenStatusVomProjekt(Integer kennung) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select status from projekt where kennung = ?");
+            preparedStatement.setInt(1, kennung);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result = resultSet.getString(1);
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public List<Spenden> findenSpenderVomProjekt(Integer kennung) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select * from spenden where projekt = ?");
+            preparedStatement.setInt(1, kennung);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Spenden> result = new ArrayList<>();
+            while (resultSet.next())
+            {
+                Spenden neuSpenden = new Spenden(resultSet.getInt(2),
+                        resultSet.getString(1),
+                        resultSet.getDouble(3),
+                        resultSet.getString(4));
+                result.add(neuSpenden);
             }
             return result;
         }catch (SQLException e)

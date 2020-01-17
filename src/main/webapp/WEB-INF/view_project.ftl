@@ -13,14 +13,14 @@
         <br/>
 </div>
 <div>
-    <#list aufprojekte as projekt>
-        <h3>${projekt.beschreibung}</h3>
+    <!--#list aufprojekte as projekt-->
+        <h3>${probeschreibung}</h3>
         <br/>
-        <li>Finanzierungslimit:${projekt.finanzierungslimit}EUR</li>
-            <li>Aktuelle Spendensumme:${projekt.finanzierungslimit}EUR</li>
-            <li>Status:</li>
-            <li>Vorgänger-Projekt:<a href="/view_project">${projekt.vorgaenger}</a></li>
-    </#list>
+        <li>Finanzierungslimit:${profinanzierungslimit}EUR</li>
+            <li>Aktuelle Spendensumme:${prospend}EUR</li>
+            <li>Status:${prostat}</li>
+            <li>Vorgänger-Projekt:<a href="/view_project">${provorgaenger}</a></li>
+    <!--/#list-->
 </div>
 <br/>
 <h1>*****************************</h1>

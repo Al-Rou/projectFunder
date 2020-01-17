@@ -11,57 +11,70 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.User;
+import de.unidue.inf.is.stores.ProjektStore;
 
+public class EditProjectServlet extends HttpServlet {
 
-public final class EditProjectServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 1L;
+        private static List<String> vorgaengerList = new ArrayList<>();
 
-    private static List<User> userList = new ArrayList<>();
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+            ProjektStore projektStore = new ProjektStore();
+            vorgaengerList = projektStore.vorgaengerList("dummy@dummy.com");
+            request.setAttribute("vorprojekte", vorgaengerList);
 
-    // Just prepare static data to display on screen
-    static {
-        userList.add(new User("Bill", "Gates",
-                "bill@gates.com","The richest"));
-        userList.add(new User("Steve", "Jobs",
-                "steve@jobs.com","Now dead"));
-        userList.add(new User("Larry", "Page",
-                "larry@page.com",""));
-        userList.add(new User("Sergey", "Brin",
-                "sergey@brin.com","Idk!"));
-        userList.add(new User("Larry", "Ellison",
-                "larry@ellison.com",""));
-    }
+            request.getRequestDispatcher("/edit_project.ftl").forward(request, response); }
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+                IOException {
 
+            String titel = request.getParameter("titel");
+            String finanzLimitStr = request.getParameter("amount");
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Put the user list in request and let freemarker paint it.
-        request.setAttribute("users", userList);
-
-        request.getRequestDispatcher("/edit_project.ftl").forward(request, response); }
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException {
-
-        String firstname = request.getParameter("firstname");
-        String lastname = request.getParameter("lastname");
-        String email = request.getParameter("email");
-        String explanation = request.getParameter("explanation");
-
-
-
-        if (null != firstname && null != lastname
-                && null != email && !firstname.isEmpty()
-                && !lastname.isEmpty() && !email.isEmpty()) {
-
-            synchronized (userList) {
-                userList.add(new User(firstname, lastname,
-                        email, explanation));
+            String kategorie = request.getParameter("group");
+            String vorgenger = request.getParameter("version");
+            String explanation = request.getParameter("explanation");
+            Integer vorgInt;
+            Integer katInt;
+            Double finanzLimit = Double.parseDouble(finanzLimitStr);
+            if (vorgenger.equalsIgnoreCase("kein vorg"))
+            {
+                vorgInt = null;
             }
+            else
+            {
+                vorgInt = 1;
+            }
+            if (kategorie.contains("Health"))
+            {
+                katInt = 1;
+            }
+            else if (kategorie.contains("Art"))
+            {
+                katInt = 2;
+            }
+            else if (kategorie.contains("Education"))
+            {
+                katInt = 3;
+            }
+            else
+            {
+                katInt = 4;
+            }
+            if (null != titel && null != finanzLimitStr
+                    && finanzLimit > 100.00) {
 
+                ProjektStore projektStore = new ProjektStore();
+                Integer neuKennung = projektStore.findenLetzteKennung()+1;
+                Projekt neuProjekt = new Projekt(neuKennung,titel,explanation,
+                        finanzLimit,"offen","dummy@dummy.com",vorgInt,katInt);
+                projektStore.editProjekt(neuProjekt);
+            }
+            doGet(request, response);
         }
-
-        doGet(request, response);
     }
+
+
 }
