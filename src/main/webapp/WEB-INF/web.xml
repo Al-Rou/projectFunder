@@ -129,9 +129,9 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>search_servlet</servlet-name>
-		<servlet-class>de.unidue.inf.is.SearchServlet</servlet-class>
-	</servlet>
+	<servlet-name>search_servlet</servlet-name>
+	<servlet-class>de.unidue.inf.is.SearchServlet</servlet-class>
+</servlet>
 
 	<servlet-mapping>
 		<servlet-name>search_servlet</servlet-name>

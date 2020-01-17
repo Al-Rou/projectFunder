@@ -28,7 +28,6 @@ public final class ProjektStore implements Closeable {
         }
     }
 
-
     public void addProjekt(Projekt projektToAdd) throws StoreException {
         try {
             PreparedStatement preparedStatement = connection
@@ -48,18 +47,14 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
-
     public Integer findenLetzteKennung() throws StoreException
     {
         try {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("select kennung from projekt order by kennung desc fetch first rows only");
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<Integer> result = new ArrayList<>();
-            while (resultSet.next()){
-                result.add(resultSet.getInt(1));
-            }
-            return result.get(0);
+            Integer result = resultSet.getInt(1);
+            return result;
 
         } catch (SQLException e)
         {
@@ -71,7 +66,8 @@ public final class ProjektStore implements Closeable {
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from projekt where status='offen'");
+                    .prepareStatement("select * from projekt where status = ?");
+            preparedStatement.setString(1, "offen");
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Projekt> result = new ArrayList<>();
             while (resultSet.next())
@@ -80,10 +76,45 @@ public final class ProjektStore implements Closeable {
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getDouble(7),
-                        resultSet.getString(6),
+                        resultSet.getString(4),
                         resultSet.getString(8),
-                        resultSet.getInt(4),
-                        resultSet.getInt(5));
+                        resultSet.getInt(5),
+                        resultSet.getInt(6));
+                result.add(newProj);
+            }
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+        finally {
+            try {
+                connection.close();
+            }
+            catch (SQLException e) {
+                throw new StoreException(e);
+            }
+        }
+    }
+    public List<Projekt> findenAbgeschlosseneProjekte() throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select * from projekt where status != ?");
+            preparedStatement.setString(1, "offen");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Projekt> result = new ArrayList<>();
+            while (resultSet.next())
+            {
+                Projekt newProj = new Projekt(resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getDouble(7),
+                        resultSet.getString(4),
+                        resultSet.getString(8),
+                        resultSet.getInt(5),
+                        resultSet.getInt(6));
                 result.add(newProj);
             }
             return result;
@@ -92,12 +123,13 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
-    public List<Projekt> findenAbgeschlosseneProjekte() throws StoreException
+    public List<Projekt> findenErstellteProjekteVon(String email) throws StoreException
     {
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from projekt where status!='offen'");
+                    .prepareStatement("select * from projekt where ersteller = ?");
+            preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Projekt> result = new ArrayList<>();
             while (resultSet.next())
@@ -106,14 +138,90 @@ public final class ProjektStore implements Closeable {
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getDouble(7),
-                        resultSet.getString(6),
+                        resultSet.getString(4),
                         resultSet.getString(8),
-                        resultSet.getInt(4),
-                        resultSet.getInt(5));
+                        resultSet.getInt(5),
+                        resultSet.getInt(6));
                 result.add(newProj);
             }
             return result;
         }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public Projekt findenProjektMitKennung(Integer kennung) throws StoreException
+    {
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select * from projekt where kennung = ?");
+            preparedStatement.setInt(1, kennung);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Projekt result = new Projekt(resultSet.getInt(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getDouble(7),
+                        resultSet.getString(4),
+                        resultSet.getString(8),
+                        resultSet.getInt(5),
+                        resultSet.getInt(6));
+            return result;
+        }catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public List<Projekt> findenUnterstuezteProjekteVon(String email) throws StoreException
+    {
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select projekt from spenden where spender = ?");
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Integer> result = new ArrayList<>();
+            while (resultSet.next())
+            {
+                result.add(resultSet.getInt(1));
+            }
+            List<Projekt> resultList = new ArrayList<>();
+            for(Integer i : result)
+            {
+                resultList.add(findenProjektMitKennung(i));
+            }
+            return resultList;
+
+        } catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public int findenAnzahlErstellteProjekteVon(String email) throws StoreException
+    {
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select count(*) from projekt where ersteller = ?");
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            int result = resultSet.getInt(1);
+            return result;
+
+        } catch (SQLException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public int findenAnzahlUnterstuezteProjekteVon(String email) throws StoreException
+    {
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select count(*) from spenden where spender = ?");
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            int result = resultSet.getInt(1);
+            return result;
+
+        } catch (SQLException e)
         {
             throw new StoreException(e);
         }
@@ -124,12 +232,13 @@ public final class ProjektStore implements Closeable {
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select titel from projekt where ersteller='%s'"+email);
+                    .prepareStatement("select titel from projekt where ersteller = ?");
+            preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> result = new ArrayList<>();
             while (resultSet.next())
             {
-                result.add(resultSet.getString(2));
+                result.add(resultSet.getString(1));
             }
             return result;
         }catch (SQLException e)

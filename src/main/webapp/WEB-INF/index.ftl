@@ -24,6 +24,6 @@
     </tr>
     </#list>
   </table>
-<a href="www.google.com">GOOGLE</a>
+<a href="www.google.com"><button type="button" name="jetz">GOOGLE</button></a>
 </body>
 </html>

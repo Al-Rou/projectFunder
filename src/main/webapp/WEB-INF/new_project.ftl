@@ -6,7 +6,7 @@
 <form name="user" action="new_project" method="post">
     Titel: <input type="text" name="titel" /> <br/>
     Finanzierungslimit: <input type="text" name="amount" />EUR<br/>
-    E-Mail: <input type="text" name="email" /><br/>
+
     Kategorie:<br/>
     <input type="radio" name="group" value="Health& Wellness"/>Health& Wellness<br/>
     <input type="radio" name="group" value="Art& Creative Works"/>Art& Creative Works<br/>
