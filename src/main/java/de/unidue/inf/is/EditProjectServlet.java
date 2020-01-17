@@ -75,6 +75,3 @@ public class EditProjectServlet extends HttpServlet {
             doGet(request, response);
         }
     }
-
-
-}
