@@ -10,7 +10,7 @@
     Spendenbetrag (EUR): <input type="text" name="lastname" /><br/>
     </tr>
     </#list>
-    <td><input type="radio" name="version"/>Anonym spenden?</td><br/>
+    <td><input type="radio" name="version" value="Anonym"/>Anonym spenden?</td><br/>
     <input type="submit" value="Spenden" />
 </form>
 </body>
