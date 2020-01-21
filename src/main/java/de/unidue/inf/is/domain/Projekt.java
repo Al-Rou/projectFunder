@@ -30,6 +30,7 @@ public final class Projekt
     public Integer getKennung() {
         return kennung;
     }
+    public void setKennung(Integer k){kennung = k;}
 
     public String getTitel() {
         return titel;

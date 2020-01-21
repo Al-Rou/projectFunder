@@ -20,20 +20,37 @@ public final class ProjektStore implements Closeable {
 
 
     public ProjektStore() throws StoreException {
+        /*try {
+            connection = DBUtil.getExternalConnection();
+            connection.setAutoCommit(false);
+            setComplete();
+        }
+        catch (SQLException e) {
+            throw new StoreException(e);
+        }*/
+    }
+    public void setComplete()
+    {
+        complete = false;
+    }
+    public Connection makeConn() throws StoreException
+    {
         try {
             connection = DBUtil.getExternalConnection();
             connection.setAutoCommit(false);
+            setComplete();
+            return connection;
         }
         catch (SQLException e) {
             throw new StoreException(e);
         }
     }
-
-    public void addProjekt(Projekt projektToAdd) throws StoreException {
+    public void addProjekt(Projekt projektToAdd) throws StoreException
+    {
+        makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("insert into projekt (kennung,titel,beschreibung,vorgaenger," +
-                            "kategorie,status,finanzierungslimit,ersteller) values (?,?,?,?,?,?,?,?)");
+                    .prepareStatement("insert into dbp032.projekt (kennung,titel,beschreibung,vorgaenger,kategorie,status,finanzierungslimit,ersteller) values (?,?,?,?,?,?,?,?)");
             preparedStatement.setInt(1, projektToAdd.getKennung());
             preparedStatement.setString(2, projektToAdd.getTitel());
             preparedStatement.setString(3, projektToAdd.getBeschreibung());
@@ -43,12 +60,16 @@ public final class ProjektStore implements Closeable {
             preparedStatement.setDouble(7, projektToAdd.getFinanzierungslimit());
             preparedStatement.setString(8, projektToAdd.getErsteller());
             preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
-            throw new StoreException(e);
-        }
+
+        preparedStatement.close();
+        complete();
+        close();
+    } catch (SQLException | IOException e) {
+        throw new StoreException(e);
     }
-    public void editProjekt(Projekt projektToAdd) throws StoreException {
+    }
+    public void editProjekt(Projekt projektToAdd) throws StoreException
+    {
         try {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("update projekt set titel = ?, beschreibung = ?, vorgaenger = ?, kategorie = ?, status = ?, finanzierungslimit = ?, ersteller = ? where kennung = ?");
@@ -62,83 +83,120 @@ public final class ProjektStore implements Closeable {
             preparedStatement.setString(7, projektToAdd.getErsteller());
             preparedStatement.setInt(8, projektToAdd.getKennung());
             preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
+
+            preparedStatement.close();
+            complete();
+            close();
+
+        } catch (SQLException | IOException e) {
             throw new StoreException(e);
         }
     }
     public Integer findenLetzteKennung() throws StoreException
     {
+        makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select kennung from projekt order by kennung desc fetch first rows only");
+                    .prepareStatement("select kennung from dbp032.projekt order by kennung desc fetch first rows only");
             ResultSet resultSet = preparedStatement.executeQuery();
-            Integer result = resultSet.getInt(1);
-            return result;
 
-        } catch (SQLException e)
-        {
-            throw new StoreException(e);
-        }
+            Integer result = null;
+            if (resultSet.next()){
+            result = resultSet.getInt(1);
+            }
+        resultSet.close();
+        preparedStatement.close();
+        complete();
+        close();
+        return result;
+    } catch (SQLException | IOException e) {
+        throw new StoreException(e);
     }
-    public List<Projekt> findenOffenProjekte() throws StoreException
+    }
+    public List<Projekt> findenOffeneProjekte() throws StoreException
     {
-        try
-        {
-            PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from projekt where status = ?");
-            preparedStatement.setString(1, "offen");
-            ResultSet resultSet = preparedStatement.executeQuery();
-            List<Projekt> result = new ArrayList<>();
-            while (resultSet.next())
-            {
-                Projekt newProj = new Projekt(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getDouble(7),
-                        resultSet.getString(4),
-                        resultSet.getString(8),
-                        resultSet.getInt(5),
-                        resultSet.getInt(6));
-                result.add(newProj);
-            }
-            return result;
-        }catch (SQLException e)
-        {
-            throw new StoreException(e);
-        }
-        finally {
+        //if(connection == null)
+        //{
+            makeConn();
+        //}
             try {
-                connection.close();
-            }
-            catch (SQLException e) {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement("select * from dbp032.projekt where status = ?");
+
+                preparedStatement.setString(1, "offen");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                List<Projekt> result = new ArrayList<>();
+                while (resultSet.next()) {
+                    result.add(new Projekt(resultSet.getInt("kennung"),
+                            resultSet.getString("titel"),
+                            resultSet.getString("beschreibung"),
+                            resultSet.getDouble("finanzierungslimit"),
+                            resultSet.getString("status"),
+                            resultSet.getString("ersteller"),
+                            resultSet.getInt("vorgaenger"),
+                            resultSet.getInt("kategorie")));
+                }
+                if (result.isEmpty())
+                {
+                    result.add(new Projekt(0,
+                            "Es gibt kein offenes Projekt!",
+                            "",
+                            0.00,
+                            "offen",
+                            "",
+                            null,
+                            1));
+                }
+                resultSet.close();
+                preparedStatement.close();
+                complete();
+                close();
+                return result;
+            } catch (SQLException | IOException e) {
                 throw new StoreException(e);
             }
-        }
     }
+
     public List<Projekt> findenAbgeschlosseneProjekte() throws StoreException
     {
+        //if(connection == null)
+        //{
+            makeConn();
+        //}
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from projekt where status != ?");
+                    .prepareStatement("select * from dbp032.projekt where status != ?");
             preparedStatement.setString(1, "offen");
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Projekt> result = new ArrayList<>();
-            while (resultSet.next())
-            {
-                Projekt newProj = new Projekt(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getDouble(7),
-                        resultSet.getString(4),
-                        resultSet.getString(8),
-                        resultSet.getInt(5),
-                        resultSet.getInt(6));
-                result.add(newProj);
+            while (resultSet.next()) {
+                result.add(new Projekt(resultSet.getInt("kennung"),
+                        resultSet.getString("titel"),
+                        resultSet.getString("beschreibung"),
+                        resultSet.getDouble("finanzierungslimit"),
+                        resultSet.getString("status"),
+                        resultSet.getString("ersteller"),
+                        resultSet.getInt("vorgaenger"),
+                        resultSet.getInt("kategorie")));
             }
+            if (result.isEmpty())
+            {
+                result.add(new Projekt(0,
+                        "Es gibt kein abgeschlossenes Projekt!",
+                        "",
+                        0.00,
+                        "offen",
+                        "",
+                        null,
+                        1));
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        } catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }
@@ -264,10 +322,11 @@ public final class ProjektStore implements Closeable {
 
     public List<String> vorgaengerList(String email) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select titel from projekt where ersteller = ?");
+                    .prepareStatement("select titel from dbp032.projekt where ersteller = ?");
             preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<String> result = new ArrayList<>();

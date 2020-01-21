@@ -5,14 +5,16 @@
 
 <body>
 <h1>ProjektFunder</h1>
-<a href="/view_profile">Mein Profil</a>
+<a href="/view_profile"><button>Mein Profil</button></a>
 <h1>Offene Projekte</h1>
 <br/>
 <div>
     <#list aufprojekte as projekt>
             <li>Titel:<a href="/view_project">${projekt.titel}</a></li>
-            <li>Von:<a href="/view_profile">${projekt.ersteller}</a></li>
-            <li>Aktuell:${projekt.finanzierungslimit}</li>
+        <li>Von:<a href="/view_profile">${projekt.ersteller}</a></li>
+        <li>Aktuell:&nbsp;${projekt.finanzierungslimit}&nbsp;EUR</li>
+
+
             <li>***********************************</li>
     </#list>
 </div>
@@ -25,10 +27,13 @@
     <#list zuprojekte as projekt>
         <li>Titel:<a href="/view_project">${projekt.titel}</a></li>
         <li>Von:<a href="/view_profile">${projekt.ersteller}</a></li>
-        <li>Aktuell:${projekt.finanzierungslimit}</li>
+        <li>Aktuell:&nbsp;${projekt.finanzierungslimit}&nbsp;EUR</li>
+
+
         <li>***********************************</li>
     </#list>
 </div>
-<a href="/new_project">Projekt erstellen</a>
+<br/>
+<a href="/new_project"><button>Projekt erstellen</button></a>
 </body>
 </html>

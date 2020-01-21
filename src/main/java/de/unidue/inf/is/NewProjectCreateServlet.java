@@ -19,36 +19,53 @@ public final class NewProjectCreateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static List<String> vorgaengerList = new ArrayList<>();
-    //private static ProjektStore projektStore = new ProjektStore();
+    private static ProjektStore projektStore = new ProjektStore();
+    private static String errorMessage = "";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ProjektStore projektStore = new ProjektStore();
+
         vorgaengerList = projektStore.vorgaengerList("dummy@dummy.com");
         request.setAttribute("vorprojekte", vorgaengerList);
+        request.setAttribute("error", errorMessage);
 
         request.getRequestDispatcher("/new_project.ftl").forward(request, response); }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-
         String titel = request.getParameter("titel");
+        if (titel.isEmpty() || (titel.length()>30))
+        {
+            errorMessage = "Titel ist entweder leer oder zu lang!";
+            doGet(request,response);
+        }
         String finanzLimitStr = request.getParameter("amount");
-
+        if (finanzLimitStr.isEmpty())
+        {
+            errorMessage = "Finanzierungslimit darf nicht leer bleiben!";
+            doGet(request,response);
+        }
+        Double finanzLimit = null;
+        try {
+        finanzLimit = Double.parseDouble(finanzLimitStr);
+        }catch (NumberFormatException e)
+        {
+            errorMessage = "Falsches Format beim Finanzierungslimit!";
+            doGet(request,response);
+        }
+        if (finanzLimit < 100.00)
+        {
+            errorMessage = "Finanzierungslimit darf nicht kleiner als" +
+                    " 100.00 EUR sein!";
+            doGet(request,response);
+        }
         String kategorie = request.getParameter("group");
-        String vorgenger = request.getParameter("version");
-        String explanation = request.getParameter("explanation");
-        Integer vorgInt;
-        Integer katInt;
-        Double finanzLimit = Double.parseDouble(finanzLimitStr);
-        if (vorgenger.equalsIgnoreCase("kein vorg"))
+        if (kategorie == null)
         {
-            vorgInt = null;
+            errorMessage = "Wählen Sie unbedingt eine Kategorie aus!";
+            doGet(request,response);
         }
-        else
-        {
-            vorgInt = 1;
-        }
+        Integer katInt = null;
         if (kategorie.contains("Health"))
         {
             katInt = 1;
@@ -61,19 +78,39 @@ public final class NewProjectCreateServlet extends HttpServlet {
         {
             katInt = 3;
         }
-        else
+        else if (kategorie.contains("Tech"))
         {
             katInt = 4;
         }
-        if (null != titel && null != finanzLimitStr
-                && finanzLimit > 100.00) {
-
-            ProjektStore projektStore = new ProjektStore();
-            Integer neuKennung = projektStore.findenLetzteKennung()+1;
-            Projekt neuProjekt = new Projekt(neuKennung,titel,explanation,
-                    finanzLimit,"offen","dummy@dummy.com",vorgInt,katInt);
-            projektStore.addProjekt(neuProjekt);
+        String vorgenger = request.getParameter("version");
+        if (vorgenger == null)
+        {
+            errorMessage = "Wählen Sie unbedingt eine der Optionen aus!";
+            doGet(request,response);
         }
+        Integer vorgInt = null;
+        if (!vorgenger.equals("Kein Vorg"))
+        {
+            vorgInt = 1;
+        }
+        String explanation = request.getParameter("explanation");
+        if (explanation == null)
+        {
+            explanation = "";
+        }
+        Integer neuKennung = projektStore.findenLetzteKennung();
+        if (neuKennung == null)
+        {
+            neuKennung = 1;
+        }
+        else
+        {
+            neuKennung = neuKennung + 1;
+        }
+        Projekt neuProjekt = new Projekt(neuKennung,titel,explanation,
+                finanzLimit,"offen","dummy@dummy.com",vorgInt,katInt);
+        projektStore.addProjekt(neuProjekt);
+        errorMessage = "Erfolg!";
         doGet(request, response);
     }
 }

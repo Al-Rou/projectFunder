@@ -24,15 +24,15 @@ public final class MainPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static List<Projekt> projektList1 = new ArrayList<>();
-    private static List<Projekt> projektList2 = new ArrayList<>();
+    private List<Projekt> projektList1 = new ArrayList<>();
+    private List<Projekt> projektList2 = new ArrayList<>();
 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         ProjektStore projektStore = new ProjektStore();
-        projektList1 = projektStore.findenOffenProjekte();
+        projektList1 = projektStore.findenOffeneProjekte();
         projektList2 = projektStore.findenAbgeschlosseneProjekte();
         request.setAttribute("aufprojekte", projektList1);
         request.setAttribute("zuprojekte", projektList2);
