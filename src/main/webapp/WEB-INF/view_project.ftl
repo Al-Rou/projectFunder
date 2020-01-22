@@ -12,24 +12,22 @@
     <h3>von:<a href="/view_profile">${projekt.ersteller}</a></h3>
         <br/>
 
-<div>
-    <!--#list aufprojekte as projekt-->
+
         <h3>${projekt.beschreibung}</h3>
         <br/>
         <li>Finanzierungslimit:${projekt.finanzierungslimit}EUR</li>
-            <li>Aktuelle Spendensumme:${projekt.finanzierungslimit}EUR</li>
+            <li>Aktuelle Spendensumme:${total}&nbsp;EUR</li>
             <li>Status:${projekt.status}</li>
-            <li>Vorgänger-Projekt:<a href="/view_project">${projekt.vorgaenger}</a></li>
-    <!--/#list-->
-</div>
+    <li>Kennung:${projekt.kennung}</li>
+
 </#list>
 <br/>
 <h1>*****************************</h1>
 <br/>
 <h1>Aktionsleiste</h1>
 <br/>
-<a href="/new_project_fund">Spenden</a>
-<a href="/edit_project">Projekt editieren</a>
+<a href="/new_project_fund"><button>Spenden</button></a>
+<a href="/edit_project"><button>Projekt editieren</button></a>
 <br/>
 <form name="del" action="delete" method="post">
     <input type="submit" value="Projekt Löschen" />
@@ -40,16 +38,18 @@
 <h1>Liste der Spender</h1>
 <br/>
 <#list spendern as spenden>
-    <li>${spenden.spender}:${spenden.spendenBetrag}EUR</li>
+    <li>${spenden.spender}:&nbsp;${spenden.spendenBetrag}&nbsp;EUR</li>
 </#list>
 <br/>
 <h1>*****************************</h1>
 <br/>
 <h1>Kommentare</h1>
 <br/>
-<#list kommente as kommentar>
-    <li>${kommentar.key}:${kommentar.value}</li>
+
+<#list kommente as showkomment>
+    <li>${showkomment.benutzer}:&nbsp;${showkomment.komtext}</li>
 </#list>
+
 <br/>
 <a href="/new_comment">kommentieren</a>
 </body>

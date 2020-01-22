@@ -23,14 +23,14 @@ public final class UserStore implements Closeable {
 
 
     public UserStore() throws StoreException {
-        try {
+        /*try {
             connection = DBUtil.getExternalConnection();
             connection.setAutoCommit(false);
             setComplete();
         }
         catch (SQLException e) {
             throw new StoreException(e);
-        }
+        }*/
     }
     public void setComplete()
     {
@@ -78,10 +78,9 @@ public final class UserStore implements Closeable {
             List<Schreibt> result = new ArrayList<>();
             while (resultSet.next())
             {
-                Schreibt neuSchreibt = new Schreibt(resultSet.getInt(2),
-                        resultSet.getString(1),
-                        resultSet.getInt(3));
-                result.add(neuSchreibt);
+                result.add(new Schreibt(resultSet.getInt("projekt"),
+                        resultSet.getString("benutzer"),
+                        resultSet.getInt("kommentar")));
             }
             resultSet.close();
             preparedStatement.close();
@@ -114,9 +113,10 @@ public final class UserStore implements Closeable {
             throw new StoreException(e);
         }
     }
-    public HashMap<String,String> werSagteWas(List<Schreibt> result)
+    public HashMap<String,String> werSagteWas(List<Schreibt> result) throws IOException
     {
         makeConn();
+        try {
         if(result != null)
         {
             HashMap<String,String> resultInMap = new HashMap<>();
@@ -125,12 +125,20 @@ public final class UserStore implements Closeable {
                 resultInMap.put(result.get(j).getBenutzer(),
                         findenTextVomKommentar(result.get(j).getKommentarId()));
             }
+            complete();
+            close();
             return resultInMap;
         }
         else
         {
+            complete();
+            close();
             return null;
         }
+    }catch (IOException e)
+    {
+        throw new StoreException(e);
+    }
     }
 
 

@@ -43,7 +43,10 @@ public final class Projekt
     public Double getFinanzierungslimit() {
         return finanzierungslimit;
     }
-
+    public void setFinanzierungslimit(Double a)
+    {
+        finanzierungslimit = a;
+    }
     public String getStatus() {
         return status;
     }

@@ -228,25 +228,25 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
-    public Projekt findenProjektMitKennung(Integer kennung) throws StoreException
+    public List<Projekt> findenProjektMitKennung(Integer kennung) throws StoreException
     {
         makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from projekt where kennung = ?");
+                    .prepareStatement("select * from dbp032.projekt where kennung = ?");
             preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Projekt result = null;
-            if (resultSet.next()) {
-                 result = new Projekt(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getDouble(7),
-                        resultSet.getString(4),
-                        resultSet.getString(8),
-                        resultSet.getInt(5),
-                        resultSet.getInt(6));
+            List<Projekt> result = new ArrayList<>();
+            while (resultSet.next()) {
+                 result.add(new Projekt(resultSet.getInt("kennung"),
+                         resultSet.getString("titel"),
+                         resultSet.getString("beschreibung"),
+                         resultSet.getDouble("finanzierungslimit"),
+                         resultSet.getString("status"),
+                         resultSet.getString("ersteller"),
+                         resultSet.getInt("vorgaenger"),
+                         resultSet.getInt("kategorie")));
             }
             resultSet.close();
             preparedStatement.close();
@@ -288,7 +288,7 @@ public final class ProjektStore implements Closeable {
             List<Projekt> resultList = new ArrayList<>();
             for(Integer i : result)
             {
-                resultList.add(findenProjektMitKennung(i));
+                resultList.add(findenProjektMitKennung(i).get(0));
             }
             return resultList;
 
@@ -380,15 +380,23 @@ public final class ProjektStore implements Closeable {
     }
     public Double findenTotalSpendeVomProjekt(Integer kennung) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select sum(spendenbetrag) from spenden where projekt = ?");
+                    .prepareStatement("select sum(spendenbetrag) from dbp032.spenden where projekt = ?");
             preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Double result = resultSet.getDouble(1);
+            Double result = null;
+            if (resultSet.next()) {
+                result = resultSet.getDouble(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        }catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }
@@ -410,23 +418,27 @@ public final class ProjektStore implements Closeable {
     }
     public List<Spenden> findenSpenderVomProjekt(Integer kennung) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from spenden where projekt = ?");
+                    .prepareStatement("select * from dbp032.spenden where projekt = ?");
             preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Spenden> result = new ArrayList<>();
             while (resultSet.next())
             {
-                Spenden neuSpenden = new Spenden(resultSet.getInt(2),
-                        resultSet.getString(1),
-                        resultSet.getDouble(3),
-                        resultSet.getString(4));
-                result.add(neuSpenden);
+                result.add(new Spenden(resultSet.getInt("projekt"),
+                        resultSet.getString("spender"),
+                        resultSet.getDouble("spendenbetrag"),
+                        resultSet.getString("sichtbarkeit")));
             }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        } catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }
