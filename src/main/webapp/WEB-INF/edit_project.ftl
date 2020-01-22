@@ -3,7 +3,10 @@
 
 <body>
 <h1>Projekt editieren</h1>
-<form name="user" action="new_project" method="post">
+<br/>
+<div>${error}</div>
+<br/>
+<form name="user" action="edit_project?kennung=${tashere}" method="post">
     Titel: <input type="text" name="titel" /> <br/>
     Finanzierungslimit: <input type="text" name="amount" />EUR<br/>
 
@@ -20,7 +23,8 @@
     </#list>
     <td><input type="radio" name="version" value="Kein Vorg"/>Kein Vorgänger</td><br/>
     Beschreibung: <input type="text" name="explanation" /> <br/>
-    <input type="submit" value="erstellen"/>
+    <input type="submit" value="aktualisieren"/>
 </form>
+<a href="/view_main"><button>Zurück zur Hauptseite</button></a>
 </body>
 </html>

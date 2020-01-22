@@ -10,58 +10,68 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.unidue.inf.is.domain.Projekt;
+import de.unidue.inf.is.domain.Spenden;
 import de.unidue.inf.is.domain.User;
+import de.unidue.inf.is.stores.ProjektStore;
 
 
 public final class NewProjectFundServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static List<User> userList = new ArrayList<>();
-
-    // Just prepare static data to display on screen
-    static {
-        userList.add(new User("Bill", "Gates",
-                "bill@gates.com","The richest"));
-        userList.add(new User("Steve", "Jobs",
-                "steve@jobs.com","Now dead"));
-        userList.add(new User("Larry", "Page",
-                "larry@page.com",""));
-        userList.add(new User("Sergey", "Brin",
-                "sergey@brin.com","Idk!"));
-        userList.add(new User("Larry", "Ellison",
-                "larry@ellison.com",""));
-    }
-
+    private static List<Projekt> projektList = new ArrayList<>();
+    private static ProjektStore projektStore = new ProjektStore();
+    private static String errorMessage = "";
+    private static String tas;
+    private static Integer kenn = null;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Put the user list in request and let freemarker paint it.
-        request.setAttribute("users", userList);
+        tas = null;
+
+        tas = request.getParameter("kennung");
+        kenn = Integer.parseInt(tas);
+        projektList = projektStore.findenProjektMitKennung(kenn);
+        request.setAttribute("projekte", projektList);
+        request.setAttribute("tashere", tas);
+        request.setAttribute("error", errorMessage);
 
         request.getRequestDispatcher("/new_project_fund.ftl").forward(request, response); }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
 
-        String firstname = request.getParameter("firstname");
-        String lastname = request.getParameter("lastname");
-        String email = request.getParameter("email");
-        String explanation = request.getParameter("explanation");
-
-
-
-        if (null != firstname && null != lastname
-                && null != email && !firstname.isEmpty()
-                && !lastname.isEmpty() && !email.isEmpty()) {
-
-            synchronized (userList) {
-                userList.add(new User(firstname, lastname,
-                        email, explanation));
-            }
-
+        String betrag = request.getParameter("spendenbetrag");
+        if ((betrag == null) || (betrag.isEmpty()))
+        {
+            errorMessage = "Geben Sie bitte eine Zahl ein!";
+            doGet(request, response);
         }
-
+        Double betragZahl = Double.parseDouble(betrag);
+        if (betragZahl == 0.00)
+        {
+            errorMessage = "Nicht luestig! Bitte geben Sie einen echten Betrag ein!";
+            doGet(request, response);
+        }
+        String sicht;
+        String sichtWahl = request.getParameter("version");
+        if (sichtWahl.equalsIgnoreCase("Anonym"))
+        {
+            sicht = "privat";
+        }
+        else if ((sichtWahl == null) || (sichtWahl.equalsIgnoreCase("")))
+        {
+            sicht = "oeffentlich";
+        }
+        else
+        {
+            sicht = "oeffentlich";
+        }
+        Spenden neuSpenden = new Spenden(kenn,
+                "dummy@dummy.com",
+                betragZahl, sicht);
+        projektStore.addSpenden(neuSpenden);
+        errorMessage = "Erfolg beim Spenden!";
         doGet(request, response);
     }
 }

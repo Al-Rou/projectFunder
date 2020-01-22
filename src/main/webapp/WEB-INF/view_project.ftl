@@ -26,8 +26,11 @@
 <br/>
 <h1>Aktionsleiste</h1>
 <br/>
-<a href="/new_project_fund"><button>Spenden</button></a>
-<a href="/edit_project"><button>Projekt editieren</button></a>
+<#list projekte as projekt>
+<a href="/new_project_fund?kennung=${projekt.kennung}"><button>Spenden</button></a>
+
+<a href="/edit_project?kennung=${projekt.kennung}"><button>Projekt editieren</button></a>
+</#list>
 <br/>
 <form name="del" action="delete" method="post">
     <input type="submit" value="Projekt Löschen" />

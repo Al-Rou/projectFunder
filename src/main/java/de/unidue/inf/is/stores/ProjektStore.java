@@ -68,11 +68,32 @@ public final class ProjektStore implements Closeable {
         throw new StoreException(e);
     }
     }
-    public void editProjekt(Projekt projektToAdd) throws StoreException
+    public void addSpenden(Spenden neuSpenden) throws StoreException
     {
+        makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("update projekt set titel = ?, beschreibung = ?, vorgaenger = ?, kategorie = ?, status = ?, finanzierungslimit = ?, ersteller = ? where kennung = ?");
+                    .prepareStatement("insert into dbp032.spenden (spender,projekt,spendenbetrag,sichtbarkeit) values (?,?,?,?)");
+            preparedStatement.setString(1, neuSpenden.getSpender());
+            preparedStatement.setInt(2, neuSpenden.getProjektKennung());
+            preparedStatement.setDouble(3, neuSpenden.getSpendenBetrag());
+            preparedStatement.setString(4, neuSpenden.getSichtbarkeit());
+
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            complete();
+            close();
+        } catch (SQLException | IOException e) {
+            throw new StoreException(e);
+        }
+    }
+    public void editProjekt(Projekt projektToAdd) throws StoreException
+    {
+        makeConn();
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("update dbp032.projekt set titel = ?, beschreibung = ?, vorgaenger = ?, kategorie = ?, status = ?, finanzierungslimit = ?, ersteller = ? where kennung = ?");
 
             preparedStatement.setString(1, projektToAdd.getTitel());
             preparedStatement.setString(2, projektToAdd.getBeschreibung());
@@ -87,7 +108,6 @@ public final class ProjektStore implements Closeable {
             preparedStatement.close();
             complete();
             close();
-
         } catch (SQLException | IOException e) {
             throw new StoreException(e);
         }

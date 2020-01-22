@@ -25,7 +25,7 @@
 <br/>
 <div>
     <#list zuprojekte as projekt>
-        <li>Titel:<a href="/view_project">${projekt.titel}</a></li>
+        <li>Titel:<a href="/view_project?kennung=${projekt.kennung}">${projekt.titel}</a></li>
         <li>Von:<a href="/view_profile">${projekt.ersteller}</a></li>
         <li>Aktuell:&nbsp;${projekt.finanzierungslimit}&nbsp;EUR</li>
 
