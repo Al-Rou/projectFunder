@@ -230,13 +230,16 @@ public final class ProjektStore implements Closeable {
     }
     public Projekt findenProjektMitKennung(Integer kennung) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
                     .prepareStatement("select * from projekt where kennung = ?");
             preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Projekt result = new Projekt(resultSet.getInt(1),
+            Projekt result = null;
+            if (resultSet.next()) {
+                 result = new Projekt(resultSet.getInt(1),
                         resultSet.getString(2),
                         resultSet.getString(3),
                         resultSet.getDouble(7),
@@ -244,8 +247,13 @@ public final class ProjektStore implements Closeable {
                         resultSet.getString(8),
                         resultSet.getInt(5),
                         resultSet.getInt(6));
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        } catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }

@@ -26,30 +26,53 @@ public final class UserStore implements Closeable {
         try {
             connection = DBUtil.getExternalConnection();
             connection.setAutoCommit(false);
+            setComplete();
         }
         catch (SQLException e) {
             throw new StoreException(e);
         }
     }
-    public void addUser(User userToAdd) throws StoreException {
+    public void setComplete()
+    {
+        complete = false;
+    }
+    public Connection makeConn() throws StoreException
+    {
+        try {
+            connection = DBUtil.getExternalConnection();
+            connection.setAutoCommit(false);
+            setComplete();
+            return connection;
+        }
+        catch (SQLException e) {
+            throw new StoreException(e);
+        }
+    }
+    public void addUser(User userToAdd) throws StoreException
+    {
+        makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                            .prepareStatement("insert into benutzer (name,email,beschreibung) values (?, ?, ?)");
+                            .prepareStatement("insert into dbp032.benutzer (name,email,beschreibung) values (?, ?, ?)");
             preparedStatement.setString(1, userToAdd.getFirstname()+
                     userToAdd.getLastname());
             preparedStatement.setString(2, userToAdd.getEmail());
             preparedStatement.setString(3, userToAdd.getExplanation());
             preparedStatement.executeUpdate();
-        }
-        catch (SQLException e) {
-            throw new StoreException(e);
-        }
+
+        preparedStatement.close();
+        complete();
+        close();
+    } catch (SQLException | IOException e) {
+        throw new StoreException(e);
+    }
     }
     public List<Schreibt> findenSchreibtVonProjekt(Integer kennung) throws StoreException
     {
+        makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select * from schreibt where projekt = ?");
+                    .prepareStatement("select * from dbp032.schreibt where projekt = ?");
             preparedStatement.setInt(1,kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Schreibt> result = new ArrayList<>();
@@ -60,28 +83,40 @@ public final class UserStore implements Closeable {
                         resultSet.getInt(3));
                 result.add(neuSchreibt);
             }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        }catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }
     }
     public String findenTextVomKommentar(Integer id) throws StoreException
     {
+        makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select text from kommentar where id = ?");
+                    .prepareStatement("select text from dbp032.kommentar where id = ?");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            String resultText = resultSet.getString(1);
+            String resultText = null;
+            if (resultSet.next()) {
+                resultText = resultSet.getString(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return resultText;
-        }catch (SQLException e)
-        {
+        } catch (SQLException | IOException e) {
             throw new StoreException(e);
         }
     }
     public HashMap<String,String> werSagteWas(List<Schreibt> result)
     {
+        makeConn();
         if(result != null)
         {
             HashMap<String,String> resultInMap = new HashMap<>();
