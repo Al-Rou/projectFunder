@@ -83,15 +83,19 @@ public final class NewProjectCreateServlet extends HttpServlet {
             katInt = 4;
         }
         String vorgenger = request.getParameter("version");
+        Integer vorgInt = null;
         if (vorgenger == null)
         {
             errorMessage = "Wählen Sie unbedingt eine der Optionen aus!";
             doGet(request,response);
         }
-        Integer vorgInt = null;
-        if (!vorgenger.equals("Kein Vorg"))
+        else if (vorgenger.equalsIgnoreCase("Kein Vorg"))
         {
-            vorgInt = 1;
+            vorgInt = 0;
+        }
+        else
+        {
+            vorgInt = projektStore.findenKennungVon(vorgenger);
         }
         String explanation = request.getParameter("explanation");
         if (explanation == null)

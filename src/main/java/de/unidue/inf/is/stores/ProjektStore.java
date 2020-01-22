@@ -260,15 +260,23 @@ public final class ProjektStore implements Closeable {
     }
     public Integer findenKennungVon(String titel) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select kennung from projekt where titel = ?");
+                    .prepareStatement("select kennung from dbp032.projekt where titel = ?");
             preparedStatement.setString(1, titel);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Integer result = resultSet.getInt(1);
+            Integer result = null;
+            if (resultSet.next()) {
+                result = resultSet.getInt(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        }catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }
