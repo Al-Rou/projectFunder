@@ -54,6 +54,8 @@
 </#list>
 
 <br/>
-<a href="/new_comment">kommentieren</a>
+<#list projekte as projekt>
+<a href="/new_comment?kennung=${projekt.kennung}"><button>kommentieren</button></a>
+</#list>
 </body>
 </html>
