@@ -18,7 +18,7 @@
 <br/>
 <div>
     <#list aufprojekte as projekt>
-        <li>Titel:<a href="/view_project">${projekt.titel}</a></li>
+        <li>Titel:<a href="/view_project?kennung=${projekt.kennung}">${projekt.titel}</a></li>
         <li>Aktuell:${projekt.finanzierungslimit}</li>
             <li>Status:${projekt.status}</li>
         <li>***********************************</li>
@@ -31,10 +31,10 @@
 <br/>
 <div>
     <#list zuprojekte as projekt>
-        <li>Titel:<a href="/view_project">${projekt.titel}</a></li>
-        <li>Limit:${projekt.finanzierungslimit}</li>
-        <li>Status:${projekt.status}</li>
-            <li>Gespendet:${projekt.finanzierungslimit}</li>
+        <li>Titel:<a href="/view_project?kennung=${projekt.projektKennung}">${projekt.projektTitel}</a></li>
+        <li>Limit:${projekt.limit}&nbsp;EUR</li>
+        <li>Status:${projekt.statu}</li>
+            <li>Gespendet:${projekt.gespendetBetrag}&nbsp;EUR</li>
         <li>***********************************</li>
     </#list>
 </div>

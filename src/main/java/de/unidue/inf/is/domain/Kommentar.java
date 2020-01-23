@@ -1,16 +1,18 @@
 package de.unidue.inf.is.domain;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public final class Kommentar {
 
     private Integer id;
     private String text;
-    private Date datum;
+    private String datum;
     private String sichtbarkeit;
 
     public Kommentar(Integer id, String text,
-                Date datum, String sichtbarkeit)
+                     String datum, String sichtbarkeit)
     {
         this.id = id;
         this.text = text;
@@ -23,7 +25,7 @@ public final class Kommentar {
     public String getText() {
         return text;
     }
-    public Date getDatum(){
+    public String getDatum(){
         return datum;
     }
     public String getSichtbarkeit()

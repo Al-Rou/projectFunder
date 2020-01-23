@@ -2,16 +2,18 @@
 <head><title>Projekt Kommentar</title>
 
 <body>
-<form name="user" action="hello" method="post">
+<#list projekte as projekt>
+    <h2>${projekt.titel}</h2>
+</#list>
 
-    <#list users as user>
-        <tr>
-            <td>${user.firstname}</td><br/>
-            <input type="text" name="explanation" />
-        </tr>
-    </#list>
-    <td><input type="radio" name="version"/>Anonym kommentieren?</td><br/>
+<form name="user" action="new_comment?kennung=${tashere}" method="post">
+    <div>
+    <h3>${error}</h3><br/>
+            <input type="text" name="explanation"/><br/>
+        <input type="radio" name="version" value="Anonym"/>Anonym kommentieren?<br/>
     <input type="submit" value="Kommentar hinzufügen" /><br/>
+    </div>
 </form>
+<a href="/view_main"><button>Zurück zur Hauptseite</button></a>
 </body>
 </html>
