@@ -17,6 +17,7 @@ import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.Spenden;
 import de.unidue.inf.is.domain.User;
 import de.unidue.inf.is.stores.ProjektStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 
 public final class NewCommentServlet extends HttpServlet {
@@ -82,8 +83,8 @@ public final class NewCommentServlet extends HttpServlet {
                 komment, geradeJetzt, sicht);
 
         projektStore.addKommentar(neuKomment);
-        projektStore.addSchreibt(neuId, kenn, "dummy@dummy.com");
-        errorMessage = "Erfolg beim Spenden!";
+        projektStore.addSchreibt(neuId, kenn, DBUtil.derBenutzer);
+        errorMessage = "Erfolg beim Hinterlassen des Komments!";
         doGet(request, response);
     }
 }

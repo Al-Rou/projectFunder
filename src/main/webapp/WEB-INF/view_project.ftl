@@ -9,7 +9,7 @@
 <#list projekte as projekt>
 <h2>${projekt.titel}</h2>
 <br/>
-    <h3>von:<a href="/view_profile">${projekt.ersteller}</a></h3>
+    <h3>von:<a href="/view_profile?email=${projekt.ersteller}">${projekt.ersteller}</a></h3>
         <br/>
 
 
@@ -57,5 +57,6 @@
 <#list projekte as projekt>
 <a href="/new_comment?kennung=${projekt.kennung}"><button>kommentieren</button></a>
 </#list>
+<a href="/view_main"><button>Zurück zur Hauptseite</button></a>
 </body>
 </html>

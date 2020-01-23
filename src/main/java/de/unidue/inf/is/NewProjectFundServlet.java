@@ -13,6 +13,7 @@ import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.Spenden;
 import de.unidue.inf.is.domain.User;
 import de.unidue.inf.is.stores.ProjektStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 
 public final class NewProjectFundServlet extends HttpServlet {
@@ -68,7 +69,7 @@ public final class NewProjectFundServlet extends HttpServlet {
             sicht = "oeffentlich";
         }
         Spenden neuSpenden = new Spenden(kenn,
-                "dummy@dummy.com",
+                DBUtil.derBenutzer,
                 betragZahl, sicht);
         projektStore.addSpenden(neuSpenden);
         errorMessage = "Erfolg beim Spenden!";

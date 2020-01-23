@@ -5,13 +5,13 @@
 
 <body>
 <h1>ProjektFunder</h1>
-<a href="/view_profile"><button>Mein Profil</button></a>
+<a href="/view_profile?email=${meinprof}"><button>Mein Profil</button></a>
 <h1>Offene Projekte</h1>
 <br/>
 <div>
     <#list aufprojekte as projekt>
             <li>Titel:<a href="/view_project?kennung=${projekt.kennung}">${projekt.titel}</a></li>
-        <li>Von:<a href="/view_profile">${projekt.ersteller}</a></li>
+        <li>Von:<a href="/view_profile?email=${projekt.ersteller}">${projekt.ersteller}</a></li>
         <li>Aktuell:&nbsp;${projekt.finanzierungslimit}&nbsp;EUR</li>
 
 
@@ -26,7 +26,7 @@
 <div>
     <#list zuprojekte as projekt>
         <li>Titel:<a href="/view_project?kennung=${projekt.kennung}">${projekt.titel}</a></li>
-        <li>Von:<a href="/view_profile">${projekt.ersteller}</a></li>
+        <li>Von:<a href="/view_profile?email=${projekt.ersteller}">${projekt.ersteller}</a></li>
         <li>Aktuell:&nbsp;${projekt.finanzierungslimit}&nbsp;EUR</li>
 
 

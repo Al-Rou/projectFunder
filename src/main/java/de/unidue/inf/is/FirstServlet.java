@@ -47,6 +47,7 @@ public class FirstServlet extends HttpServlet {
             errorMessage = username;
             DBUtil.derBenutzer = username;
             request.setAttribute("nachricht", errorMessage);
+
             request.getRequestDispatcher("/inzwischen.ftl").forward(request, response);
         }
 

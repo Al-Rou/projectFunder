@@ -26,5 +26,6 @@
     Beschreibung: <input type="text" name="explanation" /> <br/>
     <input type="submit" value="erstellen"/>
 </form>
+<a href="/view_main"><button>Zurück zur Hauptseite</button></a>
 </body>
 </html>

@@ -43,6 +43,7 @@ public final class MainPageServlet extends HttpServlet {
             }
             request.setAttribute("aufprojekte", projektList1);
             request.setAttribute("zuprojekte", projektList2);
+            request.setAttribute("meinprof", DBUtil.derBenutzer);
 
             request.getRequestDispatcher("/view_main.ftl").forward(request, response);
         }

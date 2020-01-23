@@ -21,20 +21,8 @@ public final class UserServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        // mach was
-        User userToAdd = new User("Manfred", "Mustermann",
-                "manfred@mustermann.com",
-                "");
-
-        try (UserStore userStore = new UserStore()) {
-            userStore.addUser(userToAdd);
-            // userStore.somethingElse();
-            userStore.complete();
-        }
-
-        // mach noch mehr
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
 
     }
 

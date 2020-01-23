@@ -38,5 +38,6 @@
         <li>***********************************</li>
     </#list>
 </div>
+<a href="/view_main"><button>Zurück zur Hauptseite</button></a>
 </body>
 </html>

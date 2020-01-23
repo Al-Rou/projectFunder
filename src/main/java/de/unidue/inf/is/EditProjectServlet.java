@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.User;
 import de.unidue.inf.is.stores.ProjektStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 public class EditProjectServlet extends HttpServlet {
 
@@ -31,7 +32,7 @@ public class EditProjectServlet extends HttpServlet {
             tas = request.getParameter("kennung");
             kenn = Integer.parseInt(tas);
 
-            vorgaengerList = projektStore.vorgaengerList("dummy@dummy.com");
+            vorgaengerList = projektStore.vorgaengerList(DBUtil.derBenutzer);
             request.setAttribute("vorprojekte", vorgaengerList);
             request.setAttribute("error", errorMessage);
             request.setAttribute("tashere", tas);
@@ -113,7 +114,7 @@ public class EditProjectServlet extends HttpServlet {
             }
 
             Projekt neuProjekt = new Projekt(kenn,titel,explanation,
-                    finanzLimit,"offen","dummy@dummy.com",vorgInt,katInt);
+                    finanzLimit,"offen",DBUtil.derBenutzer,vorgInt,katInt);
             projektStore.editProjekt(neuProjekt);
             errorMessage = "Erfolgreich editiert!";
             doGet(request, response);

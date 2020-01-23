@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.User;
 import de.unidue.inf.is.stores.ProjektStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 
 public final class NewProjectCreateServlet extends HttpServlet {
@@ -25,7 +26,7 @@ public final class NewProjectCreateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        vorgaengerList = projektStore.vorgaengerList("dummy@dummy.com");
+        vorgaengerList = projektStore.vorgaengerList(DBUtil.derBenutzer);
         request.setAttribute("vorprojekte", vorgaengerList);
         request.setAttribute("error", errorMessage);
 
@@ -112,7 +113,7 @@ public final class NewProjectCreateServlet extends HttpServlet {
             neuKennung = neuKennung + 1;
         }
         Projekt neuProjekt = new Projekt(neuKennung,titel,explanation,
-                finanzLimit,"offen","dummy@dummy.com",vorgInt,katInt);
+                finanzLimit,"offen",DBUtil.derBenutzer,vorgInt,katInt);
         projektStore.addProjekt(neuProjekt);
         errorMessage = "Erfolg!";
         doGet(request, response);
