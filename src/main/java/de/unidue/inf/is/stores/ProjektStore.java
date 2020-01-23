@@ -197,10 +197,7 @@ public final class ProjektStore implements Closeable {
     }
     public List<Projekt> findenOffeneProjekte() throws StoreException
     {
-        //if(connection == null)
-        //{
             makeConn();
-        //}
             try {
                 PreparedStatement preparedStatement = connection
                         .prepareStatement("select * from dbp032.projekt where status = ?");
@@ -385,6 +382,29 @@ public final class ProjektStore implements Closeable {
             Integer result = null;
             if (resultSet.next()) {
                 result = resultSet.getInt(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
+            return result;
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public List<String> findenInhaber(String username) throws StoreException
+    {
+        makeConn();
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select inhaber from dbp032.konto where inhaber = ?");
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<String> result = new ArrayList<>();
+            while (resultSet.next()) {
+                result.add(resultSet.getString(1));
             }
             resultSet.close();
             preparedStatement.close();

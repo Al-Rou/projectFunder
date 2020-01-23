@@ -32,19 +32,28 @@ public final class MainPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        projektList1 = projektStore.findenOffeneProjekte();
-        for (int b = 0; b < projektList1.size(); b++)
-        {
-            projektList1.get(b).setFinanzierungslimit(projektStore.findenTotalSpendeVomProjekt(projektList1.get(b).getKennung()));
-        }
-        projektList2 = projektStore.findenAbgeschlosseneProjekte();
-        for (int bb = 0; bb < projektList2.size(); bb++)
-        {
-            projektList2.get(bb).setFinanzierungslimit(projektStore.findenTotalSpendeVomProjekt(projektList2.get(bb).getKennung()));
-        }
-        request.setAttribute("aufprojekte", projektList1);
-        request.setAttribute("zuprojekte", projektList2);
+        if (!DBUtil.derBenutzer.isEmpty()) {
+            projektList1 = projektStore.findenOffeneProjekte();
+            for (int b = 0; b < projektList1.size(); b++) {
+                projektList1.get(b).setFinanzierungslimit(projektStore.findenTotalSpendeVomProjekt(projektList1.get(b).getKennung()));
+            }
+            projektList2 = projektStore.findenAbgeschlosseneProjekte();
+            for (int bb = 0; bb < projektList2.size(); bb++) {
+                projektList2.get(bb).setFinanzierungslimit(projektStore.findenTotalSpendeVomProjekt(projektList2.get(bb).getKennung()));
+            }
+            request.setAttribute("aufprojekte", projektList1);
+            request.setAttribute("zuprojekte", projektList2);
 
-        request.getRequestDispatcher("/view_main.ftl").forward(request, response);
+            request.getRequestDispatcher("/view_main.ftl").forward(request, response);
+        }
+        else
+        {
+            projektList1.clear();
+            projektList2.clear();
+            request.setAttribute("aufprojekte", projektList1);
+            request.setAttribute("zuprojekte", projektList2);
+
+            request.getRequestDispatcher("/view_main.ftl").forward(request, response);
+        }
     }
 }

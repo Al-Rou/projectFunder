@@ -14,6 +14,7 @@ import de.unidue.inf.is.domain.ShowGespendet;
 import de.unidue.inf.is.domain.User;
 import de.unidue.inf.is.stores.ProjektStore;
 import de.unidue.inf.is.stores.UserStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 
 public final class ViewProfileServlet extends HttpServlet {
@@ -35,14 +36,14 @@ public final class ViewProfileServlet extends HttpServlet {
         projektList3.clear();
         gespendetList.clear();
 
-        projektList1 = projektStore.findenErstellteProjekteVon("dummy@dummy.com");
+        projektList1 = projektStore.findenErstellteProjekteVon(DBUtil.derBenutzer);
         for (int b = 0; b < projektList1.size(); b++)
         {
             projektList1.get(b).setFinanzierungslimit(projektStore.findenTotalSpendeVomProjekt(projektList1.get(b).getKennung()));
         }
         request.setAttribute("aufprojekte", projektList1);
 
-        projektList2 = projektStore.findenUnterstuezteProjekteVon("dummy@dummy.com");
+        projektList2 = projektStore.findenUnterstuezteProjekteVon(DBUtil.derBenutzer);
         projektList3 = projektStore.findenProjektMitListVonKennung(projektList2);
         for (int u = 0; u < projektList3.size(); u++)
         {
@@ -50,15 +51,15 @@ public final class ViewProfileServlet extends HttpServlet {
                     projektList3.get(u).getKennung(),
                     projektList3.get(u).getFinanzierungslimit(),
                     projektList3.get(u).getStatus(),
-                    projektStore.findenGespendet("dummy@dummy.com",
+                    projektStore.findenGespendet(DBUtil.derBenutzer,
                             projektList3.get(u).getKennung())));
         }
         request.setAttribute("zuprojekte", gespendetList);
 
-        Integer erstAnzahl = projektStore.findenAnzahlErstellteProjekteVon("dummy@dummy.com");
-        Integer unteAnzahl = projektStore.findenAnzahlUnterstuezteProjekteVon("dummy@dummy.com");
+        Integer erstAnzahl = projektStore.findenAnzahlErstellteProjekteVon(DBUtil.derBenutzer);
+        Integer unteAnzahl = projektStore.findenAnzahlUnterstuezteProjekteVon(DBUtil.derBenutzer);
 
-        request.setAttribute("kontoinhab", "dummy@dummy.com");
+        request.setAttribute("kontoinhab", DBUtil.derBenutzer);
         request.setAttribute("anzahlerst", erstAnzahl);
         request.setAttribute("anzahlunte", unteAnzahl);
 

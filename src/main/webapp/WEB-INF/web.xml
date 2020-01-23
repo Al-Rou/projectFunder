@@ -129,6 +129,26 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>first_servlet</servlet-name>
+		<servlet-class>de.unidue.inf.is.FirstServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>first_servlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>inz_servlet</servlet-name>
+		<servlet-class>de.unidue.inf.is.InzServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>inz_servlet</servlet-name>
+		<url-pattern>/inzw</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 	<servlet-name>search_servlet</servlet-name>
 	<servlet-class>de.unidue.inf.is.SearchServlet</servlet-class>
 </servlet>

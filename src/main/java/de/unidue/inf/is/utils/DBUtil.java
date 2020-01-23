@@ -14,6 +14,8 @@ import com.ibm.db2.jcc.DB2Driver;
 
 public final class DBUtil {
 
+    public static String derBenutzer = "";
+
     private DBUtil() {
     }
 

@@ -5,7 +5,7 @@
 
 <body>
 
-<h1>Profil von dummy@dummy.com</h1>
+<h1>Profil von&nbsp;${kontoinhab}</h1>
 <br/>
 <div>
         <li>Benutzername:${kontoinhab}</li>
