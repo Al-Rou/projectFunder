@@ -81,8 +81,27 @@ public class DeleteProjektServlet extends HttpServlet
                     kommIdList.add(schreibtList.get(p).getKommentarId());
                 }
 
+                List<Spenden> spendenList = projektStore.findenSpenderVomProjekt(kenn);
+                for (int u = 0; u < spendenList.size(); u++)
+                {
+                    List<Double> guthabenAlt = projektStore.findenGuthaben(spendenList.get(u).getSpender());
+                    if (guthabenAlt != null)
+                    {
+                        Double guthabenNeu = guthabenAlt.get(0) + spendenList.get(u).getSpendenBetrag();
+                        projektStore.reduzierenGuthaben(spendenList.get(u).getSpender(), guthabenNeu);
+                    }
+                    else
+                    {
+                        doGet(request, response);
+                    }
+                }
+                for (int u = 0; u < spendenList.size(); u++)
+                {
+                    projektStore.deleteSpenden(kenn, spendenList.get(u).getSpender());
+                }
                 userStore.deleteSchreibtMitKommId(kommIdList);
                 userStore.deleteKommentarMitKommId(kommIdList);
+
                 doGet(request, response);
             }
     }
