@@ -92,6 +92,44 @@ public final class UserStore implements Closeable {
             throw new StoreException(e);
         }
     }
+    public void deleteSchreibtMitKommId(List<Integer> komList) throws StoreException
+    {
+        makeConn();
+        try {
+            for (int k = 0; k < komList.size(); k++) {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement("delete from dbp032.schreibt where kommentar = ?");
+                preparedStatement.setInt(1, komList.get(k));
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            }
+
+            complete();
+            close();
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public void deleteKommentarMitKommId(List<Integer> komList) throws StoreException
+    {
+        makeConn();
+        try {
+            for (int kk = 0; kk < komList.size(); kk++) {
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement("delete from dbp032.kommentar where id = ?");
+                preparedStatement.setInt(1, komList.get(kk));
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            }
+
+            complete();
+            close();
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
     public String findenTextVomKommentar(Integer id) throws StoreException
     {
         makeConn();

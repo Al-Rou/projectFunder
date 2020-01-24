@@ -87,13 +87,11 @@ public final class NewProjectFundServlet extends HttpServlet {
                                 doGet(request, response);
                             }
                         }
-                        else
-                        {
-                            projektStore.addSpenden(neuSpenden);
-                            projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
-                            errorMessage = "Erfolg beim Spenden!";
-                            doGet(request, response);
-                        }
+                        projektStore.addSpenden(neuSpenden);
+                        projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
+                        errorMessage = "Erfolg beim Spenden!";
+                        doGet(request, response);
+
                     }
                 }
             }

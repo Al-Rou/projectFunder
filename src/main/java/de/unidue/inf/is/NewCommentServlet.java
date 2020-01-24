@@ -57,17 +57,13 @@ public final class NewCommentServlet extends HttpServlet {
 
         String sicht;
         String sichtWahl = request.getParameter("version");
-        if (sichtWahl.equalsIgnoreCase("Anonym"))
-        {
-            sicht = "privat";
-        }
-        else if ((sichtWahl == null) || (sichtWahl.equalsIgnoreCase("")))
+        if (sichtWahl == null)
         {
             sicht = "oeffentlich";
         }
         else
         {
-            sicht = "oeffentlich";
+            sicht = "privat";
         }
         Integer neuId = projektStore.findenLetzteId();
         if (neuId == null)
