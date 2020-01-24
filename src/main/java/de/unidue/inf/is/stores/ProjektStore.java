@@ -393,24 +393,43 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
-    public List<String> findenInhaber(String username) throws StoreException
+    public List<Double> findenGuthaben(String username) throws StoreException
     {
         makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select inhaber from dbp032.konto where inhaber = ?");
+                    .prepareStatement("select guthaben from dbp032.konto where inhaber = ?");
             preparedStatement.setString(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<String> result = new ArrayList<>();
+            List<Double> result = new ArrayList<>();
             while (resultSet.next()) {
-                result.add(resultSet.getString(1));
+                result.add(resultSet.getDouble("guthaben"));
             }
             resultSet.close();
             preparedStatement.close();
             complete();
             close();
             return result;
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public void reduzierenGuthaben(String username, Double betrag) throws StoreException
+    {
+        makeConn();
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("update dbp032.konto set guthaben = ? where inhaber = ?");
+            preparedStatement.setDouble(1, betrag);
+            preparedStatement.setString(2, username);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            complete();
+            close();
         }catch (SQLException | IOException e)
         {
             throw new StoreException(e);
@@ -620,6 +639,79 @@ public final class ProjektStore implements Closeable {
             complete();
             close();
             return result;
+        } catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public List<Double> findenSpendenbetragVomProjektMitEmail(Integer kennung, String email) throws StoreException
+    {
+        makeConn();
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select spendenbetrag from dbp032.spenden where projekt = ? and spender = ?");
+            preparedStatement.setInt(1, kennung);
+            preparedStatement.setString(2, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Double> result = new ArrayList<>();
+            while (resultSet.next())
+            {
+                result.add(resultSet.getDouble("spendenbetrag"));
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
+            return result;
+        } catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public boolean wennSpenderExistiert(String email) throws StoreException
+    {
+        makeConn();
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select count(*) from dbp032.spenden where spender = ?");
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Integer r = null;
+            boolean result = true;
+            if (resultSet.next())
+            {
+                r = resultSet.getInt(1);
+            }
+            if ((r == null) || (r == 0))
+            {
+                result = false;
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
+            return result;
+        } catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public void updateSpendenbetragVomProjektMitEmail(Double betrag, Integer kennung, String email) throws StoreException
+    {
+        makeConn();
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("update dbp032.spenden set spendenbetrag = ? where projekt = ? and spender = ?");
+            preparedStatement.setDouble(1, betrag);
+            preparedStatement.setInt(2, kennung);
+            preparedStatement.setString(3, email);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            complete();
+            close();
         } catch (SQLException | IOException e)
         {
             throw new StoreException(e);

@@ -30,12 +30,10 @@
 <a href="/new_project_fund?kennung=${projekt.kennung}"><button>Spenden</button></a>
 
 <a href="/edit_project?kennung=${projekt.kennung}"><button>Projekt editieren</button></a>
+    <br/>
+    <a href="/delete_project?kennung=${projekt.kennung}"><button>Projekt löschen?</button></a>
+    <br/>
 </#list>
-<br/>
-<form name="del" action="delete" method="post">
-    <input type="submit" value="Projekt Löschen" />
-</form>
-<br/>
 <h1>*****************************</h1>
 <br/>
 <h1>Liste der Spender</h1>

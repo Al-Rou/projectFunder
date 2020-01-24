@@ -41,38 +41,62 @@ public final class NewProjectFundServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-
+        String sicht = "oeffentlich";
+        String sichtWahl = request.getParameter("version");
+        if (sichtWahl != null)
+        {
+            sicht = "privat";
+        }
         String betrag = request.getParameter("spendenbetrag");
-        if ((betrag == null) || (betrag.isEmpty()))
+        if (betrag.isEmpty())
         {
             errorMessage = "Geben Sie bitte eine Zahl ein!";
             doGet(request, response);
         }
-        Double betragZahl = Double.parseDouble(betrag);
-        if (betragZahl == 0.00)
-        {
-            errorMessage = "Nicht luestig! Bitte geben Sie einen echten Betrag ein!";
-            doGet(request, response);
+        else {
+            Double betragZahl = Double.parseDouble(betrag);
+            List<Double> checkGuthaben = projektStore.findenGuthaben(DBUtil.derBenutzer);
+            if (checkGuthaben == null) {
+                errorMessage = "Sie haben wohl kein Konto!";
+                doGet(request, response);
+            } else {
+                Double unterschied = null;
+                if (betragZahl <= 0.00) {
+                    errorMessage = "Nicht lustig! Bitte geben Sie einen echten Betrag ein!";
+                    doGet(request, response);
+                } else {
+                    unterschied = checkGuthaben.get(0) - betragZahl;
+                    if (unterschied < 0) {
+                        errorMessage = "Sie haben nicht genug Guthaben!";
+                        doGet(request, response);
+                    } else {
+                        Spenden neuSpenden = new Spenden(kenn,
+                                DBUtil.derBenutzer,
+                                betragZahl, sicht);
+                        if (projektStore.wennSpenderExistiert(DBUtil.derBenutzer))
+                        {
+                            List<Double> existierterBetrag = projektStore.findenSpendenbetragVomProjektMitEmail(kenn, DBUtil.derBenutzer);
+                            if (existierterBetrag != null) {
+                                Double neuBetrag = existierterBetrag.get(0) + betragZahl;
+                                projektStore.updateSpendenbetragVomProjektMitEmail(neuBetrag, kenn, DBUtil.derBenutzer);
+                                projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
+                                errorMessage = "Erfolg beim Spenden!";
+                                doGet(request, response);
+                            } else {
+                                errorMessage = "Etwas ist falsch!!";
+                                doGet(request, response);
+                            }
+                        }
+                        else
+                        {
+                            projektStore.addSpenden(neuSpenden);
+                            projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
+                            errorMessage = "Erfolg beim Spenden!";
+                            doGet(request, response);
+                        }
+                    }
+                }
+            }
         }
-        String sicht;
-        String sichtWahl = request.getParameter("version");
-        if (sichtWahl.equalsIgnoreCase("Anonym"))
-        {
-            sicht = "privat";
-        }
-        else if ((sichtWahl == null) || (sichtWahl.equalsIgnoreCase("")))
-        {
-            sicht = "oeffentlich";
-        }
-        else
-        {
-            sicht = "oeffentlich";
-        }
-        Spenden neuSpenden = new Spenden(kenn,
-                DBUtil.derBenutzer,
-                betragZahl, sicht);
-        projektStore.addSpenden(neuSpenden);
-        errorMessage = "Erfolg beim Spenden!";
-        doGet(request, response);
     }
 }

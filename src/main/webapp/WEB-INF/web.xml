@@ -168,6 +168,16 @@
 		<url-pattern>/projectFunder</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>deleteProject_servlet</servlet-name>
+		<servlet-class>de.unidue.inf.is.DeleteProjektServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>deleteProject_servlet</servlet-name>
+		<url-pattern>/delete_project</url-pattern>
+	</servlet-mapping>
+
 	<!-- Prevent the visiting of MVC Views from outside the servlet container. 
 		RequestDispatcher.forward/include should and will still work. Removing this 
 		may open security holes! -->
