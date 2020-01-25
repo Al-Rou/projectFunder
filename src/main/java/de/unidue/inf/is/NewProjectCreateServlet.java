@@ -90,13 +90,15 @@ public final class NewProjectCreateServlet extends HttpServlet {
             errorMessage = "Wählen Sie unbedingt eine der Optionen aus!";
             doGet(request,response);
         }
-        else if (vorgenger.equalsIgnoreCase("Kein Vorg"))
-        {
-            vorgInt = 0;
-        }
         else
         {
-            vorgInt = projektStore.findenKennungVon(vorgenger);
+            if (vorgenger.equalsIgnoreCase("Kein Vorg"))
+            {
+                vorgInt = null;
+            }
+            else {
+                vorgInt = projektStore.findenKennungVon(vorgenger);
+            }
         }
         String explanation = request.getParameter("explanation");
         if (explanation == null)

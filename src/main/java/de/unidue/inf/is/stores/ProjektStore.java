@@ -55,7 +55,13 @@ public final class ProjektStore implements Closeable {
             preparedStatement.setInt(1, projektToAdd.getKennung());
             preparedStatement.setString(2, projektToAdd.getTitel());
             preparedStatement.setString(3, projektToAdd.getBeschreibung());
-            preparedStatement.setInt(4, projektToAdd.getVorgaenger());
+            if (projektToAdd.getVorgaenger() == null)
+            {
+                preparedStatement.setObject(4, null);
+            }
+            else {
+                preparedStatement.setInt(4, projektToAdd.getVorgaenger());
+            }
             preparedStatement.setInt(5, projektToAdd.getKategorie());
             preparedStatement.setString(6, projektToAdd.getStatus());
             preparedStatement.setDouble(7, projektToAdd.getFinanzierungslimit());
