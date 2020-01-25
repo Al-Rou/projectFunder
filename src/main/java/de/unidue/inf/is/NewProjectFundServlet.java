@@ -37,23 +37,22 @@ public final class NewProjectFundServlet extends HttpServlet {
         request.setAttribute("tashere", tas);
         request.setAttribute("error", errorMessage);
 
-        request.getRequestDispatcher("/new_project_fund.ftl").forward(request, response); }
+        request.getRequestDispatcher("/new_project_fund.ftl").forward(request, response);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
         String sicht = "oeffentlich";
         String sichtWahl = request.getParameter("version");
-        if (sichtWahl != null)
-        {
+        if (sichtWahl != null) {
             sicht = "privat";
         }
         String betrag = request.getParameter("spendenbetrag");
-        if (betrag.isEmpty())
-        {
+        if (betrag.isEmpty()) {
             errorMessage = "Geben Sie bitte eine Zahl ein!";
             doGet(request, response);
-        }
-        else {
+        } else {
             Double betragZahl = Double.parseDouble(betrag);
             List<Double> checkGuthaben = projektStore.findenGuthaben(DBUtil.derBenutzer);
             if (checkGuthaben == null) {
@@ -73,25 +72,31 @@ public final class NewProjectFundServlet extends HttpServlet {
                         Spenden neuSpenden = new Spenden(kenn,
                                 DBUtil.derBenutzer,
                                 betragZahl, sicht);
-                        if (projektStore.wennSpenderExistiert(DBUtil.derBenutzer))
-                        {
-                            List<Double> existierterBetrag = projektStore.findenSpendenbetragVomProjektMitEmail(kenn, DBUtil.derBenutzer);
-                            if (existierterBetrag != null) {
-                                Double neuBetrag = existierterBetrag.get(0) + betragZahl;
-                                projektStore.updateSpendenbetragVomProjektMitEmail(neuBetrag, kenn, DBUtil.derBenutzer);
-                                projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
-                                errorMessage = "Erfolg beim Spenden!";
-                                doGet(request, response);
-                            } else {
-                                errorMessage = "Etwas ist falsch!!";
-                                doGet(request, response);
+                        //if (projektStore.wennSpenderExistiert(DBUtil.derBenutzer)) {
+                        List<Double> existierterBetrag = projektStore.findenSpendenbetragVomProjektMitEmail(kenn, DBUtil.derBenutzer);
+                        if (existierterBetrag != null) {
+                            Double neuBetrag = existierterBetrag.get(0) + betragZahl;
+                            projektStore.updateSpendenbetragVomProjektMitEmail(neuBetrag, kenn, DBUtil.derBenutzer);
+                            projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
+                            Double a = projektStore.findenTotalSpendeVomProjekt(kenn);
+                            Double b = projektStore.findenFinanzierungsLimitVon(kenn);
+                            if (a >= b)
+                            {
+                                projektStore.wechselStatus(kenn);
                             }
-                        }
-                        projektStore.addSpenden(neuSpenden);
-                        projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
-                        errorMessage = "Erfolg beim Spenden!";
-                        doGet(request, response);
+                            errorMessage = "Erfolg beim Spenden!";
+                            doGet(request, response);
+                        } //else {
+                            //errorMessage = "Etwas ist falsch!!";
+                            //doGet(request, response);
+                            //}
+                            //}
+                            projektStore.addSpenden(neuSpenden);
+                            projektStore.reduzierenGuthaben(DBUtil.derBenutzer, unterschied);
+                            errorMessage = "Erfolg beim Spenden!";
+                            doGet(request, response);
 
+                       // }
                     }
                 }
             }

@@ -633,17 +633,43 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
-    public Double findenFinanzierungsLimitVon(String titel) throws StoreException
+    public Double findenFinanzierungsLimitVon(Integer kennung) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select finanzierungslimit from projekt where titel = ?");
-            preparedStatement.setString(1, titel);
+                    .prepareStatement("select finanzierungslimit from dbp032.projekt where kennung = ?");
+            preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Double result = resultSet.getDouble(1);
+            Double result = null;
+            if (resultSet.next()) {
+                result = resultSet.getDouble(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public void wechselStatus(Integer kennung) throws StoreException
+    {
+        makeConn();
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("update dbp032.projekt set status = ? where kennung = ?");
+            preparedStatement.setString(1, "geschlossen");
+            preparedStatement.setInt(2, kennung);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            complete();
+            close();
+        } catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }
