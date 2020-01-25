@@ -344,6 +344,34 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
+    public boolean obProjektIstVorgaenger(Integer kennung) throws StoreException
+    {
+        makeConn();
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select kennung from dbp032.projekt where vorgaenger = ?");
+            preparedStatement.setInt(1, kennung);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Integer> result = new ArrayList<>();
+            boolean res = false;
+            while (resultSet.next()) {
+                result.add(resultSet.getInt(1));
+            }
+            if (result != null)
+            {
+                res = true;
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
+            return res;
+        } catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
     public List<Projekt> findenProjektMitListVonKennung(List<Integer> kennungList) throws StoreException
     {
         makeConn();

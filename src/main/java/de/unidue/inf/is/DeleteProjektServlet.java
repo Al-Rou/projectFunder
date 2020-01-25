@@ -1,10 +1,12 @@
 package de.unidue.inf.is;
 
+import com.ibm.db2.jcc.uw.DB2Exception;
 import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.Schreibt;
 import de.unidue.inf.is.domain.ShowKomment;
 import de.unidue.inf.is.domain.Spenden;
 import de.unidue.inf.is.stores.ProjektStore;
+import de.unidue.inf.is.stores.StoreException;
 import de.unidue.inf.is.stores.UserStore;
 
 import javax.servlet.ServletException;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +53,7 @@ public class DeleteProjektServlet extends HttpServlet
         if ((projektList != null) && (!projektList.isEmpty()))
         {
             proName = projektList.get(0).getTitel();
-            request.setAttribute("error", proName);
+            request.setAttribute("error", proName+mess);
         }
         else
         {
@@ -61,7 +64,7 @@ public class DeleteProjektServlet extends HttpServlet
         request.getRequestDispatcher("/delete_project.ftl").forward(request, response); }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException {
+            IOException, StoreException {
 
         String antwort = request.getParameter("group");
         if (antwort == null)
@@ -74,6 +77,7 @@ public class DeleteProjektServlet extends HttpServlet
         }
         else
             {
+                try{
                 List<Schreibt> schreibtList = userStore.findenSchreibtVonProjekt(kenn);
                 List<Integer> kommIdList = new ArrayList<>();
                 for (int p = 0; p < schreibtList.size(); p++)
@@ -102,8 +106,15 @@ public class DeleteProjektServlet extends HttpServlet
                 userStore.deleteSchreibtMitKommId(kommIdList);
                 userStore.deleteKommentarMitKommId(kommIdList);
 
-                projektStore.deleteProjekt(kenn);
-                doGet(request, response);
+                //if (!projektStore.obProjektIstVorgaenger(kenn)) {
+                    projektStore.deleteProjekt(kenn);
+                    doGet(request, response);
+                } catch (StoreException e)
+                {
+                    mess = " ist selbst der Vorgänger eines anderen Projekts!";
+                    doGet(request, response);
+                }
+
             }
     }
 }
