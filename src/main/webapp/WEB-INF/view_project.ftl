@@ -18,8 +18,10 @@
         <li>Finanzierungslimit:${projekt.finanzierungslimit}EUR</li>
             <li>Aktuelle Spendensumme:${total}&nbsp;EUR</li>
             <li>Status:${projekt.status}</li>
-    <li>Kennung:${projekt.kennung}</li>
-
+</#list>
+<br/>
+<#list vorga as projekt>
+<li>Vorgänger:${projekt.titel}</li>
 </#list>
 <br/>
 <h1>*****************************</h1>

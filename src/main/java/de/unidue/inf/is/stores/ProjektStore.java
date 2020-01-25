@@ -502,6 +502,23 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
+    public void deleteProjekt(Integer kennung) throws StoreException
+    {
+        makeConn();
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("delete from dbp032.projekt where kennung = ?");
+            preparedStatement.setInt(1, kennung);
+            preparedStatement.executeUpdate();
+
+            preparedStatement.close();
+            complete();
+            close();
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
     public Integer findenAnzahlErstellteProjekteVon(String email) throws StoreException
     {
         makeConn();

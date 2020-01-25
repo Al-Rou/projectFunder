@@ -102,6 +102,7 @@ public class DeleteProjektServlet extends HttpServlet
                 userStore.deleteSchreibtMitKommId(kommIdList);
                 userStore.deleteKommentarMitKommId(kommIdList);
 
+                projektStore.deleteProjekt(kenn);
                 doGet(request, response);
             }
     }

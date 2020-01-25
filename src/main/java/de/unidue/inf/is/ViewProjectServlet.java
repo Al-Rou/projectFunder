@@ -47,6 +47,11 @@ public final class ViewProjectServlet extends HttpServlet {
         projektList = projektStore.findenProjektMitKennung(proKenn);
 
         request.setAttribute("projekte", projektList);
+        if (projektList != null)
+        {
+            List<Projekt> vorgPro = projektStore.findenProjektMitKennung(projektList.get(0).getVorgaenger());
+            request.setAttribute("vorga", vorgPro);
+        }
 
         totalspend = projektStore.findenTotalSpendeVomProjekt(proKenn);
         request.setAttribute("total", totalspend);
