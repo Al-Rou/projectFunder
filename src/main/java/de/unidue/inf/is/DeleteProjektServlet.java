@@ -8,6 +8,7 @@ import de.unidue.inf.is.domain.Spenden;
 import de.unidue.inf.is.stores.ProjektStore;
 import de.unidue.inf.is.stores.StoreException;
 import de.unidue.inf.is.stores.UserStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,10 +55,11 @@ public class DeleteProjektServlet extends HttpServlet
         {
             proName = projektList.get(0).getTitel();
             request.setAttribute("error", proName+mess);
+            mess = "";
         }
         else
         {
-            request.setAttribute("error", "Erfolgreiches Löschen! Das Projekt ist nicht mehr gefunden!");
+            request.setAttribute("error", "Das Projekt ist nicht mehr gefunden!");
         }
         request.setAttribute("tashere", tas);
 
@@ -69,49 +71,51 @@ public class DeleteProjektServlet extends HttpServlet
         String antwort = request.getParameter("group");
         if (antwort == null)
         {
+            mess = " wartet schon auf Ihre Wahl!";
             doGet(request, response);
         }
         else if (antwort.equalsIgnoreCase("no"))
         {
+            mess = " wird dann richtig bleiben!";
             doGet(request, response);
         }
         else
             {
-                try{
-                List<Schreibt> schreibtList = userStore.findenSchreibtVonProjekt(kenn);
-                List<Integer> kommIdList = new ArrayList<>();
-                for (int p = 0; p < schreibtList.size(); p++)
-                {
-                    kommIdList.add(schreibtList.get(p).getKommentarId());
-                }
+                if (DBUtil.derBenutzer.equalsIgnoreCase(projektList.get(0).getErsteller())) {
+                    try {
+                        List<Schreibt> schreibtList = userStore.findenSchreibtVonProjekt(kenn);
+                        List<Integer> kommIdList = new ArrayList<>();
+                        for (int p = 0; p < schreibtList.size(); p++) {
+                            kommIdList.add(schreibtList.get(p).getKommentarId());
+                        }
 
-                List<Spenden> spendenList = projektStore.findenSpenderVomProjekt(kenn);
-                for (int u = 0; u < spendenList.size(); u++)
-                {
-                    List<Double> guthabenAlt = projektStore.findenGuthaben(spendenList.get(u).getSpender());
-                    if (guthabenAlt != null)
-                    {
-                        Double guthabenNeu = guthabenAlt.get(0) + spendenList.get(u).getSpendenBetrag();
-                        projektStore.reduzierenGuthaben(spendenList.get(u).getSpender(), guthabenNeu);
-                    }
-                    else
-                    {
+                        List<Spenden> spendenList = projektStore.findenSpenderVomProjekt(kenn);
+                        for (int u = 0; u < spendenList.size(); u++) {
+                            List<Double> guthabenAlt = projektStore.findenGuthaben(spendenList.get(u).getSpender());
+                            if (guthabenAlt != null) {
+                                Double guthabenNeu = guthabenAlt.get(0) + spendenList.get(u).getSpendenBetrag();
+                                projektStore.reduzierenGuthaben(spendenList.get(u).getSpender(), guthabenNeu);
+                            } else {
+                                doGet(request, response);
+                            }
+                        }
+                        for (int u = 0; u < spendenList.size(); u++) {
+                            projektStore.deleteSpenden(kenn, spendenList.get(u).getSpender());
+                        }
+                        userStore.deleteSchreibtMitKommId(kommIdList);
+                        userStore.deleteKommentarMitKommId(kommIdList);
+
+                        //if (!projektStore.obProjektIstVorgaenger(kenn)) {
+                        projektStore.deleteProjekt(kenn);
+                        doGet(request, response);
+                    } catch (StoreException e) {
+                        mess = " ist selbst der Vorgänger eines anderen Projekts!";
                         doGet(request, response);
                     }
                 }
-                for (int u = 0; u < spendenList.size(); u++)
+                else
                 {
-                    projektStore.deleteSpenden(kenn, spendenList.get(u).getSpender());
-                }
-                userStore.deleteSchreibtMitKommId(kommIdList);
-                userStore.deleteKommentarMitKommId(kommIdList);
-
-                //if (!projektStore.obProjektIstVorgaenger(kenn)) {
-                    projektStore.deleteProjekt(kenn);
-                    doGet(request, response);
-                } catch (StoreException e)
-                {
-                    mess = " ist selbst der Vorgänger eines anderen Projekts!";
+                    mess = " muss nur vom Ersteller gelöscht werden!";
                     doGet(request, response);
                 }
 

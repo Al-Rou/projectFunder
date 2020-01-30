@@ -1,10 +1,7 @@
 package de.unidue.inf.is;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,13 +47,32 @@ public final class ViewProjectServlet extends HttpServlet {
         if (projektList != null)
         {
             List<Projekt> vorgPro = projektStore.findenProjektMitKennung(projektList.get(0).getVorgaenger());
-            request.setAttribute("vorga", vorgPro);
+            //request.setAttribute("vorga", vorgPro);
+            if ((vorgPro == null) || (vorgPro.isEmpty()))
+            {
+                vorgPro.add(new Projekt(1, "Kein Vorgänger vorhanden!",
+                        "",5678.00,
+                        "offen", "ali",
+                        null, 3));
+                request.setAttribute("vorga", vorgPro);
+            }
+            else
+            {
+                request.setAttribute("vorga", vorgPro);
+            }
         }
 
         totalspend = projektStore.findenTotalSpendeVomProjekt(proKenn);
         request.setAttribute("total", totalspend);
 
         spendenList = projektStore.findenSpenderVomProjekt(proKenn);
+        spendenList.sort(Comparator.comparingDouble(Spenden::getSpendenBetrag).reversed());
+        for (int k = 0; k < spendenList.size(); k++){
+            if (spendenList.get(k).getSichtbarkeit().equalsIgnoreCase("privat"))
+            {
+                spendenList.get(k).setSpender("Anonym");
+            }
+        }
         request.setAttribute("spendern", spendenList);
 
         schreibtList = userStore.findenSchreibtVonProjekt(proKenn);
@@ -70,6 +86,14 @@ public final class ViewProjectServlet extends HttpServlet {
                     schreibtList.get(k).getKommentarId(),
                     textList.get(k)));
         }
+        for (int kk = 0; kk < kommentarList.size(); kk++)
+        {
+            if (projektStore.findenSichtbarkeitVomKommentar(kommentarList.get(kk).getKomid()).equalsIgnoreCase("privat"))
+            {
+                kommentarList.get(kk).setBenutzer("Anonym");
+            }
+        }
+        kommentarList.sort(Comparator.comparingInt(ShowKomment::getKomid).reversed());
         request.setAttribute("kommente", kommentarList);
 
         request.getRequestDispatcher("/view_project.ftl").forward(request, response); }

@@ -144,7 +144,14 @@ public final class ProjektStore implements Closeable {
 
             preparedStatement.setString(1, projektToAdd.getTitel());
             preparedStatement.setString(2, projektToAdd.getBeschreibung());
-            preparedStatement.setInt(3, projektToAdd.getVorgaenger());
+            //preparedStatement.setInt(3, projektToAdd.getVorgaenger());
+            if (projektToAdd.getVorgaenger() == null)
+            {
+                preparedStatement.setObject(3, null);
+            }
+            else {
+                preparedStatement.setInt(3, projektToAdd.getVorgaenger());
+            }
             preparedStatement.setInt(4, projektToAdd.getKategorie());
             preparedStatement.setString(5, projektToAdd.getStatus());
             preparedStatement.setDouble(6, projektToAdd.getFinanzierungslimit());
@@ -697,17 +704,50 @@ public final class ProjektStore implements Closeable {
             throw new StoreException(e);
         }
     }
-    public String findenStatusVomProjekt(Integer kennung) throws StoreException
+    public String findenSichtbarkeitVomKommentar(Integer komId) throws StoreException
     {
+        makeConn();
         try
         {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select status from projekt where kennung = ?");
+                    .prepareStatement("select sichtbarkeit from dbp032.kommentar where id = ?");
+            preparedStatement.setInt(1, komId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result = null;
+            if (resultSet.next())
+            {
+                result = resultSet.getString(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
+            return result;
+        }catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public String findenTitelVomProjekt(Integer kennung) throws StoreException
+    {
+        makeConn();
+        try
+        {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select titel from dbp032.projekt where kennung = ?");
             preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
-            String result = resultSet.getString(1);
+            String result = null;
+            if (resultSet.next())
+            {
+                result = resultSet.getString(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
             return result;
-        }catch (SQLException e)
+        }catch (SQLException | IOException e)
         {
             throw new StoreException(e);
         }

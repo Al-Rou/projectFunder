@@ -23,6 +23,7 @@ public final class Spenden {
     public String getSpender() {
         return spender;
     }
+    public void setSpender(String s){ spender = s;}
     public Double getSpendenBetrag(){
         return spendenBetrag;
     }

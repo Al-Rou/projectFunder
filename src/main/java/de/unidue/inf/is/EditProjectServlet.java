@@ -34,6 +34,13 @@ public class EditProjectServlet extends HttpServlet {
 
 
         vorgaengerList = projektStore.vorgaengerList(DBUtil.derBenutzer);
+        for (int k = 0; k < vorgaengerList.size(); k++)
+        {
+            if (vorgaengerList.get(k).equalsIgnoreCase(projektStore.findenTitelVomProjekt(kenn)))
+            {
+                vorgaengerList.remove(k);
+            }
+        }
         request.setAttribute("vorprojekte", vorgaengerList);
         request.setAttribute("error", errorMessage);
         request.setAttribute("tashere", tas);
@@ -91,10 +98,10 @@ public class EditProjectServlet extends HttpServlet {
                 String vorgenger = request.getParameter("version");
                 Integer vorgInt = null;
                 if (vorgenger == null) {
-                    errorMessage = "Wählen Sie unbedingt eine der Optionen aus!";
+                    errorMessage = "Wählen Sie unbedingt eine der Optionen der Vorgänger aus!";
                     doGet(request, response);
                 } else if (vorgenger.equalsIgnoreCase("Kein Vorg")) {
-                    vorgInt = 0;
+                    vorgInt = null;
                 } else {
                     vorgInt = projektStore.findenKennungVon(vorgenger);
                 }

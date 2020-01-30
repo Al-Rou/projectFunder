@@ -15,6 +15,7 @@ public class ShowKomment {
     {
         return benutzer;
     }
+    public void setBenutzer(String s){ benutzer = s;}
     public String getKomtext(){return komtext;}
     public Integer getKomid(){return komid;}
 }
