@@ -6,6 +6,7 @@
 <body>
 <h1>ProjektFunder</h1>
 <a href="/view_profile?email=${meinprof}"><button>Mein Profil</button></a>
+<a href="/search"><button>suchen</button></a>
 <h1>Offene Projekte</h1>
 <br/>
 <div>

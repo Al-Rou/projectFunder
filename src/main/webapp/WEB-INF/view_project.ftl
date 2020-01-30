@@ -28,11 +28,13 @@
 <br/>
 <h1>Aktionsleiste</h1>
 <br/>
-<#list projekte as projekt>
+<#list projektes as projekt>
 <a href="/new_project_fund?kennung=${projekt.kennung}"><button>Spenden</button></a>
 
 <a href="/edit_project?kennung=${projekt.kennung}"><button>Projekt editieren</button></a>
-    <br/>
+    </#list>
+<br/>
+<#list projekte as projekt>
     <a href="/delete_project?kennung=${projekt.kennung}"><button>Projekt löschen?</button></a>
     <br/>
 </#list>

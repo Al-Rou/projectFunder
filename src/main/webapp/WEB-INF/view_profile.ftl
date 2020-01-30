@@ -8,7 +8,7 @@
 <h1>Profil von&nbsp;${kontoinhab}</h1>
 <br/>
 <div>
-        <li>Benutzername:${kontoinhab}</li>
+        <li>Benutzername:${kontoinhabname}</li>
         <li>Anzahl erstellter Projekte:${anzahlerst}</li>
         <li>Anzahl unterstüzter Projekte:${anzahlunte}</li>
 </div>

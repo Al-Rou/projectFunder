@@ -481,8 +481,9 @@ public final class ProjektStore implements Closeable {
         makeConn();
         try {
             PreparedStatement preparedStatement = connection
-                    .prepareStatement("select projekt from dbp032.spenden where spender = ?");
+                    .prepareStatement("select projekt from dbp032.spenden where spender = ? and sichtbarkeit = ?");
             preparedStatement.setString(1, email);
+            preparedStatement.setString(2, "oeffentlich");
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Integer> result = new ArrayList<>();
             while (resultSet.next())
@@ -519,6 +520,58 @@ public final class ProjektStore implements Closeable {
             complete();
             close();
             return result.get(0);
+
+        } catch (SQLException | IOException e)
+        {
+            throw new StoreException(e);
+        }
+    }
+    public List<Projekt> findenProjekteDurchSuchen(String suchWort1, String suchWort2) throws StoreException
+    {
+        makeConn();
+        try {
+            char[] suchWortLow = suchWort1.toCharArray();
+            char[] suchWortUp = suchWort2.toCharArray();
+            //for (int i = 0; i < suchWortLow.length;) {
+
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement("select * from dbp032.projekt where titel like ? or titel like ?");
+                preparedStatement.setString(1, suchWortLow[0] + "%");
+                preparedStatement.setString(2, suchWortUp[0] + "%");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                List<Projekt> result = new ArrayList<>();
+                while (resultSet.next()) {
+                    result.add(new Projekt(resultSet.getInt("kennung"),
+                            resultSet.getString("titel"),
+                            resultSet.getString("beschreibung"),
+                            resultSet.getDouble("finanzierungslimit"),
+                            resultSet.getString("status"),
+                            resultSet.getString("ersteller"),
+                            resultSet.getInt("vorgaenger"),
+                            resultSet.getInt("kategorie")));
+                }
+                resultSet.close();
+                preparedStatement.close();
+                if ((result == null) || (result.isEmpty()))
+                {
+                    complete();
+                    close();
+                    return null;
+                }
+                else
+                {
+                    List<Projekt> realResult = new ArrayList<>();
+                    for (int z = 0; z < result.size(); z++)
+                    {
+                        if ((result.get(z).getTitel().toLowerCase().startsWith(suchWort1)))
+                        {
+                            realResult.add(result.get(z));
+                        }
+                    }
+                    complete();
+                    close();
+                    return realResult;
+                }
 
         } catch (SQLException | IOException e)
         {

@@ -18,6 +18,7 @@ public final class ViewProjectServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private static List<Projekt> projektList = new ArrayList<>();
+    private static List<Projekt> projektList2 = new ArrayList<>();
     private static ProjektStore projektStore = new ProjektStore();
     private static List<Spenden> spendenList = new ArrayList<>();
     private static UserStore userStore = new UserStore();
@@ -34,6 +35,7 @@ public final class ViewProjectServlet extends HttpServlet {
             sta = null;
             totalspend = null;
             projektList.clear();
+            projektList2.clear();
             schreibtList.clear();
             kommentarList.clear();
             textList.clear();
@@ -61,6 +63,14 @@ public final class ViewProjectServlet extends HttpServlet {
                 request.setAttribute("vorga", vorgPro);
             }
         }
+        for (int p = 0; p < projektList.size(); p++)
+        {
+            if (projektList.get(p).getStatus().equalsIgnoreCase("offen"))
+            {
+                projektList2.add(projektList.get(p));
+            }
+        }
+        request.setAttribute("projektes", projektList2);
 
         totalspend = projektStore.findenTotalSpendeVomProjekt(proKenn);
         request.setAttribute("total", totalspend);

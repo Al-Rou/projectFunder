@@ -42,6 +42,7 @@ public final class NewCommentServlet extends HttpServlet {
         request.setAttribute("projekte", projektList);
         request.setAttribute("tashere", tas);
         request.setAttribute("error", errorMessage);
+        errorMessage = "";
 
         request.getRequestDispatcher("/new_comment.ftl").forward(request, response); }
     @Override
@@ -54,33 +55,28 @@ public final class NewCommentServlet extends HttpServlet {
             errorMessage = "Falls Sie nix haben, zu sagen, sind Sie hier falsch!";
             doGet(request, response);
         }
+        else {
+            String sicht;
+            String sichtWahl = request.getParameter("version");
+            if (sichtWahl == null) {
+                sicht = "oeffentlich";
+            } else {
+                sicht = "privat";
+            }
+            Integer neuId = projektStore.findenLetzteId();
+            if (neuId == null) {
+                neuId = 1;
+            } else {
+                neuId = neuId + 1;
+            }
+            String geradeJetzt = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss").format(new Timestamp(System.currentTimeMillis()));
+            Kommentar neuKomment = new Kommentar(neuId,
+                    komment, geradeJetzt, sicht);
 
-        String sicht;
-        String sichtWahl = request.getParameter("version");
-        if (sichtWahl == null)
-        {
-            sicht = "oeffentlich";
+            projektStore.addKommentar(neuKomment);
+            projektStore.addSchreibt(neuId, kenn, DBUtil.derBenutzer);
+            errorMessage = "Erfolg beim Hinterlassen des Komments!";
+            doGet(request, response);
         }
-        else
-        {
-            sicht = "privat";
-        }
-        Integer neuId = projektStore.findenLetzteId();
-        if (neuId == null)
-        {
-            neuId = 1;
-        }
-        else
-        {
-            neuId = neuId + 1;
-        }
-        String geradeJetzt = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss").format(new Timestamp(System.currentTimeMillis()));
-        Kommentar neuKomment = new Kommentar(neuId,
-                komment, geradeJetzt, sicht);
-
-        projektStore.addKommentar(neuKomment);
-        projektStore.addSchreibt(neuId, kenn, DBUtil.derBenutzer);
-        errorMessage = "Erfolg beim Hinterlassen des Komments!";
-        doGet(request, response);
     }
 }

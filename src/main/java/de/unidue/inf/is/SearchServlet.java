@@ -11,57 +11,64 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.unidue.inf.is.domain.Projekt;
 import de.unidue.inf.is.domain.User;
+import de.unidue.inf.is.stores.ProjektStore;
+import de.unidue.inf.is.utils.DBUtil;
 
 
 public final class SearchServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static List<User> userList = new ArrayList<>();
-
-    // Just prepare static data to display on screen
-    static {
-        userList.add(new User("Bill", "Gates",
-                "bill@gates.com","The richest"));
-        userList.add(new User("Steve", "Jobs",
-                "steve@jobs.com","Now dead"));
-        userList.add(new User("Larry", "Page",
-                "larry@page.com",""));
-        userList.add(new User("Sergey", "Brin",
-                "sergey@brin.com","Idk!"));
-        userList.add(new User("Larry", "Ellison",
-                "larry@ellison.com",""));
-    }
-
+    private static List<Projekt> projektList = new ArrayList<>();
+    private static List<Projekt> projektList2 = new ArrayList<>();
+    private static ProjektStore projektStore = new ProjektStore();
+    private static String errormessage = "";
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Put the user list in request and let freemarker paint it.
-        request.setAttribute("users", userList);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        projektList2.clear();
+        if (projektList != null) {
+            request.setAttribute("aufprojekte", projektList);
+            request.setAttribute("error", errormessage);
+            errormessage = "";
+        }
+        else
+        {
+            request.setAttribute("aufprojekte", projektList2);
+            request.setAttribute("error", errormessage);
+            errormessage = "";
+        }
+
 
         request.getRequestDispatcher("/search.ftl").forward(request, response); }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-
-        String firstname = request.getParameter("firstname");
-        String lastname = request.getParameter("lastname");
-        String email = request.getParameter("email");
-        String explanation = request.getParameter("explanation");
-
-
-
-        if (null != firstname && null != lastname
-                && null != email && !firstname.isEmpty()
-                && !lastname.isEmpty() && !email.isEmpty()) {
-
-            synchronized (userList) {
-                userList.add(new User(firstname, lastname,
-                        email, explanation));
-            }
-
+        String suchWort = request.getParameter("projektname");
+        if ((suchWort == null) || (suchWort.isEmpty()))
+        {
+            errormessage = "Suchen Sie nix?!";
+            projektList.clear();
+            doGet(request, response);
         }
-
-        doGet(request, response);
+        else
+        {
+            String suchWort1 = suchWort.toLowerCase();
+            String suchWort2 = suchWort.toUpperCase();
+            projektList = projektStore.findenProjekteDurchSuchen(suchWort1, suchWort2);
+            if ((projektList == null) || (projektList.isEmpty()))
+            {
+                errormessage = "Kein Ergebnis!";
+                doGet(request, response);
+            }
+            else {
+                for (int b = 0; b < projektList.size(); b++) {
+                    projektList.get(b).setFinanzierungslimit(projektStore.findenTotalSpendeVomProjekt(projektList.get(b).getKennung()));
+                }
+                errormessage = "";
+                doGet(request, response);
+            }
+        }
     }
 }

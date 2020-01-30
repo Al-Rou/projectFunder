@@ -26,6 +26,7 @@ public final class ViewProfileServlet extends HttpServlet {
     private static List<Projekt> projektList3 = new ArrayList<>();
     private static List<ShowGespendet> gespendetList = new ArrayList<>();
     private static ProjektStore projektStore = new ProjektStore();
+    private static UserStore userStore = new UserStore();
     private static String sta;
 
 
@@ -63,6 +64,8 @@ public final class ViewProfileServlet extends HttpServlet {
         Integer unteAnzahl = projektStore.findenAnzahlUnterstuezteProjekteVon(sta);
 
         request.setAttribute("kontoinhab", sta);
+        String benutzerName = userStore.findenBenutzername(sta);
+        request.setAttribute("kontoinhabname", benutzerName);
         request.setAttribute("anzahlerst", erstAnzahl);
         request.setAttribute("anzahlunte", unteAnzahl);
 

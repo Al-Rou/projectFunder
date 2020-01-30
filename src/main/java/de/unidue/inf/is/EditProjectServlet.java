@@ -43,6 +43,7 @@ public class EditProjectServlet extends HttpServlet {
         }
         request.setAttribute("vorprojekte", vorgaengerList);
         request.setAttribute("error", errorMessage);
+        errorMessage = "";
         request.setAttribute("tashere", tas);
 
         request.getRequestDispatcher("/edit_project.ftl").forward(request, response);
@@ -57,64 +58,85 @@ public class EditProjectServlet extends HttpServlet {
         List<Projekt> ch = projektStore.findenErstellteProjekteVon(DBUtil.derBenutzer);
         for (int w = 0; w < ch.size(); w++) {
             if (ch.get(w).getKennung() == kenn) {
-
-                String titel = request.getParameter("titel");
-                if (titel.isEmpty() || (titel.length() > 30)) {
-                    errorMessage = "Titel ist entweder leer oder zu lang!";
-                    doGet(request, response);
-                }
-                String finanzLimitStr = request.getParameter("amount");
-                if (finanzLimitStr.isEmpty()) {
-                    errorMessage = "Finanzierungslimit darf nicht leer bleiben!";
-                    doGet(request, response);
-                }
-                Double finanzLimit = null;
                 try {
-                    finanzLimit = Double.parseDouble(finanzLimitStr);
-                } catch (NumberFormatException e) {
-                    errorMessage = "Falsches Format beim Finanzierungslimit!";
-                    doGet(request, response);
-                }
-                if (finanzLimit < 100.00) {
-                    errorMessage = "Finanzierungslimit darf nicht kleiner als" +
-                            " 100.00 EUR sein!";
-                    doGet(request, response);
-                }
-                String kategorie = request.getParameter("group");
-                if (kategorie == null) {
-                    errorMessage = "Wählen Sie unbedingt eine Kategorie aus!";
-                    doGet(request, response);
-                }
-                Integer katInt = null;
-                if (kategorie.contains("Health")) {
-                    katInt = 1;
-                } else if (kategorie.contains("Art")) {
-                    katInt = 2;
-                } else if (kategorie.contains("Education")) {
-                    katInt = 3;
-                } else if (kategorie.contains("Tech")) {
-                    katInt = 4;
-                }
-                String vorgenger = request.getParameter("version");
-                Integer vorgInt = null;
-                if (vorgenger == null) {
-                    errorMessage = "Wählen Sie unbedingt eine der Optionen der Vorgänger aus!";
-                    doGet(request, response);
-                } else if (vorgenger.equalsIgnoreCase("Kein Vorg")) {
-                    vorgInt = null;
-                } else {
-                    vorgInt = projektStore.findenKennungVon(vorgenger);
-                }
-                String explanation = request.getParameter("explanation");
-                if (explanation == null) {
-                    explanation = "";
-                }
 
-                Projekt neuProjekt = new Projekt(kenn, titel, explanation,
-                        finanzLimit, "offen", DBUtil.derBenutzer, vorgInt, katInt);
-                projektStore.editProjekt(neuProjekt);
-                errorMessage = "Erfolgreich editiert!";
-                doGet(request, response);
+                    String titel = request.getParameter("titel");
+                    if (titel.isEmpty() || (titel.length() > 30)) {
+                        errorMessage = "Titel ist entweder leer oder zu lang!";
+                        doGet(request, response);
+                    }
+                    else {
+                    String finanzLimitStr = request.getParameter("amount");
+                    if (finanzLimitStr.isEmpty()) {
+                        errorMessage = "Finanzierungslimit darf nicht leer bleiben!";
+                        doGet(request, response);
+                    }
+                    else {
+                    Double finanzLimit = null;
+                    try {
+                        finanzLimit = Double.parseDouble(finanzLimitStr);
+                    } catch (NumberFormatException e) {
+                        errorMessage = "Falsches Format beim Finanzierungslimit!";
+                        doGet(request, response);
+                    }
+                    if (finanzLimit < projektStore.findenFinanzierungsLimitVon(kenn)) {
+                        errorMessage = "Neues Finanzierungslimit darf nicht kleiner als" +
+                                " das Alte sein!";
+                        doGet(request, response);
+                    }
+                    else {
+                        String kategorie = request.getParameter("group");
+                        if (kategorie == null) {
+                            errorMessage = "Wählen Sie unbedingt eine Kategorie aus!";
+                            doGet(request, response);
+                        }
+                        else {
+                            Integer katInt = null;
+                            if (kategorie.contains("Health")) {
+                                katInt = 1;
+                            } else if (kategorie.contains("Art")) {
+                                katInt = 2;
+                            } else if (kategorie.contains("Education")) {
+                                katInt = 3;
+                            } else if (kategorie.contains("Tech")) {
+                                katInt = 4;
+                            }
+                            String vorgenger = request.getParameter("version");
+                            Integer vorgInt = null;
+                            if (vorgenger == null) {
+                                errorMessage = "Wählen Sie unbedingt eine der Optionen der Vorgänger aus!";
+                                doGet(request, response);
+                            }
+                            else if (vorgenger.equalsIgnoreCase("Kein Vorg")) {
+                                vorgInt = null;
+                            }
+                            else {
+                                vorgInt = projektStore.findenKennungVon(vorgenger);
+                            }
+                            String explanation = request.getParameter("explanation");
+                            if (explanation == null) {
+                                explanation = "";
+                            }
+                            if (projektStore.findenProjektMitKennung(kenn).get(0).getStatus().equalsIgnoreCase("offen")) {
+                                Projekt neuProjekt = new Projekt(kenn, titel, explanation,
+                                        finanzLimit, "offen", DBUtil.derBenutzer, vorgInt, katInt);
+                                projektStore.editProjekt(neuProjekt);
+                                errorMessage = "Erfolgreich editiert!";
+                                doGet(request, response);
+                            }
+                            else
+                            {
+                                errorMessage = "Wir haben die Taste des Editierens weggeworfen! Warum sind Sie durch Addressbar hereingekommen?!";
+                                doGet(request, response);
+                            }
+                        }
+                    }
+                    }
+                    }
+                } catch (IOException | ServletException e) {
+                    errorMessage = "Etwas ist los mit Datenbanken oder Verbindungen oder dem Programm!";
+                    doGet(request, response);
+                }
             }
         }
         errorMessage = "Nur der Ersteller darf das Projekt editieren!";

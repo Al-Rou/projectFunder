@@ -151,6 +151,27 @@ public final class UserStore implements Closeable {
             throw new StoreException(e);
         }
     }
+    public String findenBenutzername(String email) throws StoreException
+    {
+        makeConn();
+        try {
+            PreparedStatement preparedStatement = connection
+                    .prepareStatement("select name from dbp032.benutzer where email = ?");
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            String result = null;
+            if (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+            resultSet.close();
+            preparedStatement.close();
+            complete();
+            close();
+            return result;
+        } catch (SQLException | IOException e) {
+            throw new StoreException(e);
+        }
+    }
     public HashMap<String,String> werSagteWas(List<Schreibt> result) throws IOException
     {
         makeConn();
