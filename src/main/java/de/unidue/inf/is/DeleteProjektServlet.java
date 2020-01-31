@@ -82,33 +82,42 @@ public class DeleteProjektServlet extends HttpServlet
         else
             {
                 if (DBUtil.derBenutzer.equalsIgnoreCase(projektList.get(0).getErsteller())) {
-                    try {
-                        List<Schreibt> schreibtList = userStore.findenSchreibtVonProjekt(kenn);
-                        List<Integer> kommIdList = new ArrayList<>();
-                        for (int p = 0; p < schreibtList.size(); p++) {
-                            kommIdList.add(schreibtList.get(p).getKommentarId());
-                        }
-
-                        List<Spenden> spendenList = projektStore.findenSpenderVomProjekt(kenn);
-                        for (int u = 0; u < spendenList.size(); u++) {
-                            List<Double> guthabenAlt = projektStore.findenGuthaben(spendenList.get(u).getSpender());
-                            if (guthabenAlt != null) {
-                                Double guthabenNeu = guthabenAlt.get(0) + spendenList.get(u).getSpendenBetrag();
-                                projektStore.reduzierenGuthaben(spendenList.get(u).getSpender(), guthabenNeu);
-                            } else {
-                                doGet(request, response);
+                    if (!projektStore.obProjektIstVorgaenger(kenn)) {
+                        try {
+                            List<Schreibt> schreibtList = userStore.findenSchreibtVonProjekt(kenn);
+                            List<Integer> kommIdList = new ArrayList<>();
+                            for (int p = 0; p < schreibtList.size(); p++) {
+                                kommIdList.add(schreibtList.get(p).getKommentarId());
                             }
-                        }
-                        for (int u = 0; u < spendenList.size(); u++) {
-                            projektStore.deleteSpenden(kenn, spendenList.get(u).getSpender());
-                        }
-                        userStore.deleteSchreibtMitKommId(kommIdList);
-                        userStore.deleteKommentarMitKommId(kommIdList);
 
-                        //if (!projektStore.obProjektIstVorgaenger(kenn)) {
-                        projektStore.deleteProjekt(kenn);
-                        doGet(request, response);
-                    } catch (StoreException e) {
+                            List<Spenden> spendenList = projektStore.findenSpenderVomProjekt(kenn);
+                            for (int u = 0; u < spendenList.size(); u++) {
+                                List<Double> guthabenAlt = projektStore.findenGuthaben(spendenList.get(u).getSpender());
+                                if (guthabenAlt != null) {
+                                    Double guthabenNeu = guthabenAlt.get(0) + spendenList.get(u).getSpendenBetrag();
+                                    projektStore.reduzierenGuthaben(spendenList.get(u).getSpender(), guthabenNeu);
+                                } else {
+                                    doGet(request, response);
+                                }
+                            }
+                            for (int u = 0; u < spendenList.size(); u++) {
+                                projektStore.deleteSpenden(kenn, spendenList.get(u).getSpender());
+                            }
+                            userStore.deleteSchreibtMitKommId(kommIdList);
+                            userStore.deleteKommentarMitKommId(kommIdList);
+
+                            //if (!projektStore.obProjektIstVorgaenger(kenn)) {
+                            projektStore.deleteProjekt(kenn);
+                            //doGet(request, response);
+                            MainPageServlet mainPageServlet = new MainPageServlet();
+                            mainPageServlet.doGet(request, response);
+                        } catch (StoreException e) {
+                            mess = " ist selbst der Vorgänger eines anderen Projekts!";
+                            doGet(request, response);
+                        }
+                    }
+                    else
+                    {
                         mess = " ist selbst der Vorgänger eines anderen Projekts!";
                         doGet(request, response);
                     }

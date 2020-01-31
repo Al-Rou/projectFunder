@@ -48,7 +48,10 @@ public class FirstServlet extends HttpServlet {
             DBUtil.derBenutzer = username;
             request.setAttribute("nachricht", errorMessage);
 
-            request.getRequestDispatcher("/inzwischen.ftl").forward(request, response);
+            //request.getRequestDispatcher("/inzwischen.ftl").forward(request, response);
+            //request.getRequestDispatcher("/view_main.ftl").forward(request, response);
+            MainPageServlet mainPageServlet = new MainPageServlet();
+            mainPageServlet.doGet(request, response);
         }
 
     }

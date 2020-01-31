@@ -122,7 +122,9 @@ public class EditProjectServlet extends HttpServlet {
                                         finanzLimit, "offen", DBUtil.derBenutzer, vorgInt, katInt);
                                 projektStore.editProjekt(neuProjekt);
                                 errorMessage = "Erfolgreich editiert!";
-                                doGet(request, response);
+                                //doGet(request, response);
+                                ViewProjectServlet viewProjectServlet = new ViewProjectServlet();
+                                viewProjectServlet.doGet(request, response);
                             }
                             else
                             {

@@ -117,7 +117,9 @@ public final class NewProjectFundServlet extends HttpServlet {
                                 if (a >= b) {
                                     projektStore.wechselStatus(kenn);
                                 }
-                                doGet(request, response);
+                                //doGet(request, response);
+                                ViewProjectServlet viewProjectServlet = new ViewProjectServlet();
+                                viewProjectServlet.doGet(request, response);
                             }
                         }
 

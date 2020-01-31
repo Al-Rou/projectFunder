@@ -361,11 +361,15 @@ public final class ProjektStore implements Closeable {
             preparedStatement.setInt(1, kennung);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Integer> result = new ArrayList<>();
-            boolean res = false;
+            boolean res;
             while (resultSet.next()) {
                 result.add(resultSet.getInt(1));
             }
-            if (result != null)
+            if ((result == null) || (result.isEmpty()))
+            {
+                res = false;
+            }
+            else
             {
                 res = true;
             }
